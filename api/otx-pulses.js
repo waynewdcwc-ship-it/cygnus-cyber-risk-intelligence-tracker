@@ -35,7 +35,8 @@ export default async function handler(request, response) {
       name: pulse.name || 'Unnamed OTX pulse',
       description: pulse.description ? String(pulse.description).slice(0, 220) : '',
       modified: pulse.modified || pulse.created || '',
-      indicatorCount: Array.isArray(pulse.indicators) ? pulse.indicators.length : Number(pulse.indicator_count || 0)
+      indicatorCount: Array.isArray(pulse.indicators) ? pulse.indicators.length : Number(pulse.indicator_count || 0),
+      url: pulse.id ? `https://otx.alienvault.com/pulse/${pulse.id}` : ''
     }));
 
     return response.status(200).json({

@@ -329,6 +329,26 @@ main { max-width: 1180px; margin: -28px auto 0; padding: 0 clamp(18px, 4vw, 36px
 .source-item span { color: rgba(255,255,255,0.70); }
 .source-item em { color: var(--cygnus-cyan); font-style: normal; font-weight: 900; font-size: 0.78rem; text-align: right; }
 
+
+.otx-source-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--cygnus-blue);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.82rem;
+  width: fit-content;
+}
+.otx-source-link.disabled {
+  background: var(--cygnus-panel-soft);
+  color: var(--cygnus-muted);
+}
+
 .methodology-section { padding-top: 12px; }
 .method-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .method-card { padding: 20px; }

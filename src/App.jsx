@@ -10,6 +10,7 @@ import {
   ClipboardCheck,
   DatabaseZap,
   Eye,
+  ExternalLink,
   FileWarning,
   Flame,
   Globe2,
@@ -200,7 +201,7 @@ function Header() {
         <div className="brand-ribbon-inner">
           <span><BadgeCheck size={14} /> Cygnus Development</span>
           <span>Risk Intelligence Technology</span>
-          <span>Cyber Risk Intelligence Tracker v0.4</span>
+          <span>Cyber Risk Intelligence Tracker v0.5</span>
         </div>
       </div>
 
@@ -333,11 +334,10 @@ function OtxLivePanel() {
     <section id="otx-live" className="content-section otx-section">
       <div className="section-heading">
         <div>
-          <div className="section-kicker"><DatabaseZap size={16} /> Live OTX Foundation</div>
-          <h2>Secure OTX preview route</h2>
+          <div className="section-kicker"><DatabaseZap size={16} /> Live OTX Feed</div>
+          <h2>OTX feed with source links</h2>
           <p>
-            This panel calls a Vercel serverless function rather than placing the OTX key in the frontend. If the key or
-            API route is unavailable, the tracker safely falls back to static cyber intelligence content.
+            This panel calls a secure Vercel serverless function and now provides direct links to the full OTX pulse in a new tab. The dashboard stays clean while the source detail remains accessible.
           </p>
         </div>
         <div className={`otx-status ${status}`}>{status === 'live' ? 'Live route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
@@ -348,8 +348,7 @@ function OtxLivePanel() {
           <div className="status-row"><span className="pulse-dot" /> {message}</div>
           <h3>OTX API Foundation</h3>
           <p>
-            The frontend requests <strong>/api/otx-pulses</strong>. The serverless function then adds the private OTX API key
-            on the server side and returns a simplified preview payload for the tracker.
+            The frontend requests <strong>/api/otx-pulses</strong>. The serverless function keeps the private OTX API key on the server side and returns simplified pulse summaries plus source links.
           </p>
         </div>
 
@@ -357,12 +356,27 @@ function OtxLivePanel() {
           {status === 'live' && pulses.length > 0 ? (
             pulses.map((pulse) => (
               <article className="otx-pulse-card" key={pulse.id || pulse.name}>
-                <strong>{pulse.name}</strong>
-                <span>{pulse.description || 'No description provided in the preview payload.'}</span>
+                <div>
+                  <strong>{pulse.name}</strong>
+                  <span>{pulse.description || 'No description provided in the preview payload.'}</span>
+                </div>
                 <div className="otx-meta">
                   <em>{pulse.indicatorCount} indicators</em>
                   <em>{pulse.modified || 'Modified date unavailable'}</em>
                 </div>
+                {pulse.url ? (
+                  <a
+                    className="otx-source-link"
+                    href={pulse.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Open full OTX pulse for ${pulse.name}`}
+                  >
+                    View full OTX pulse <ExternalLink size={14} />
+                  </a>
+                ) : (
+                  <span className="otx-source-link disabled">Source link unavailable</span>
+                )}
               </article>
             ))
           ) : (
@@ -583,7 +597,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.4 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v0.5 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }

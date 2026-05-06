@@ -1,8 +1,12 @@
-# Cygnus Cyber Risk Intelligence Tracker v0.4
+# Cygnus Cyber Risk Intelligence Tracker v0.5
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v0.4 updates
+## v0.5 updates
+
+- OTX feed cards now include a View full OTX pulse link
+- Full OTX pulse pages open in a new browser tab
+- Dashboard remains uncluttered while source detail remains accessible
 
 - Added a more complete top navigation system
 - Added a strategic cyber watchlist section
