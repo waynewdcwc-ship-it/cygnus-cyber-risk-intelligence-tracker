@@ -1,21 +1,16 @@
-# Cygnus Cyber Risk Intelligence Tracker v0.2 Clean Branded Preview
+# Cygnus Cyber Risk Intelligence Tracker v0.3
 
-Fresh clean Vite/Vercel-ready public preview for the Cygnus Cyber Risk Intelligence Tracker.
+Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## Purpose
+## v0.3 updates
 
-This is a separate Cygnus web tracker focused on cyber risk intelligence. It uses the Cygnus Development – Risk Intelligence Technology visual identity and is designed as a clean static baseline before live API integration.
-
-## v0.2 clean baseline includes
-
-- Cygnus Development – Risk Intelligence Technology branding
-- Static cyber risk intelligence public preview
-- Executive-facing cyber threat landscape
-- Sector exposure view
-- Cyber risk methodology section
-- OTX/API integration clearly reserved for a later phase
-- Clean GitHub/Vercel-ready structure
-- No node_modules, no dist folder, no Vercel cache
+- Added a more complete top navigation system
+- Added a strategic cyber watchlist section
+- Added an executive readiness snapshot
+- Added a terminology and help section
+- Improved content structure and section flow
+- Kept the Cygnus Development – Risk Intelligence Technology branding
+- Kept OTX/API integration reserved for a later phase
 
 ## Run locally
 

@@ -6,9 +6,12 @@ import {
   Bug,
   CheckCircle2,
   ChevronRight,
+  CircleHelp,
+  ClipboardCheck,
   DatabaseZap,
   Eye,
   FileWarning,
+  Flame,
   Globe2,
   Info,
   Landmark,
@@ -72,6 +75,36 @@ const threatItems = [
   }
 ];
 
+const watchlist = [
+  {
+    title: 'Identity compromise',
+    priority: 'Immediate',
+    detail: 'Monitor privileged access, MFA fatigue attempts, suspicious sign-ins, impossible travel, and abnormal session persistence.'
+  },
+  {
+    title: 'Internet-facing systems',
+    priority: 'High',
+    detail: 'Track exposed VPNs, firewalls, remote access tools, outdated web applications, and unmanaged externally visible assets.'
+  },
+  {
+    title: 'Third-party dependency',
+    priority: 'High',
+    detail: 'Review critical vendors, software update channels, outsourced IT providers, cloud integrations, and privileged service accounts.'
+  },
+  {
+    title: 'Data exposure',
+    priority: 'Elevated',
+    detail: 'Prioritise sensitive data locations, public cloud storage checks, email forwarding rules, and unusual outbound traffic patterns.'
+  }
+];
+
+const readinessItems = [
+  { label: 'Backups tested', status: 'Validate', description: 'Confirm restore tests, offline copies, and separation from production credentials.' },
+  { label: 'MFA coverage', status: 'Strengthen', description: 'Prioritise administrator, finance, email, VPN, and cloud console access.' },
+  { label: 'Logging visibility', status: 'Improve', description: 'Ensure sign-in, endpoint, cloud, firewall, and email logs are retained and reviewable.' },
+  { label: 'Incident roles', status: 'Define', description: 'Clarify decision-makers, technical responders, communications owners, and escalation paths.' }
+];
+
 const sectorRisk = [
   { sector: 'Financial Services', level: 'High', driver: 'Fraud, ransomware, credential compromise, and third-party exposure' },
   { sector: 'Healthcare', level: 'High', driver: 'Ransomware disruption, sensitive data exposure, and legacy system dependency' },
@@ -117,6 +150,25 @@ const methodology = [
   }
 ];
 
+const terminology = [
+  {
+    term: 'Threat theme',
+    meaning: 'A recurring cyber risk pattern such as ransomware, phishing, supply-chain compromise, or cloud exposure.'
+  },
+  {
+    term: 'Indicator',
+    meaning: 'A technical clue that may suggest suspicious or malicious activity, such as a domain, IP address, hash, or file name.'
+  },
+  {
+    term: 'Pulse',
+    meaning: 'A grouped intelligence item, often containing related indicators, adversary context, malware references, or campaign notes.'
+  },
+  {
+    term: 'Confidence',
+    meaning: 'A judgement about how reliable and complete the available information appears to be.'
+  }
+];
+
 const brandingPrinciples = [
   {
     icon: <Landmark size={18} />,
@@ -148,7 +200,7 @@ function Header() {
         <div className="brand-ribbon-inner">
           <span><BadgeCheck size={14} /> Cygnus Development</span>
           <span>Risk Intelligence Technology</span>
-          <span>Cyber Risk Intelligence Tracker v0.2</span>
+          <span>Cyber Risk Intelligence Tracker v0.3</span>
         </div>
       </div>
 
@@ -163,20 +215,25 @@ function Header() {
             <p className="brand-subline">Risk Intelligence Technology</p>
           </div>
         </div>
-        <div className="version-pill">Clean Branded Preview v0.2</div>
+        <div className="nav-links" aria-label="Page navigation">
+          <a href="#watchlist">Watchlist</a>
+          <a href="#threat-landscape">Threats</a>
+          <a href="#readiness">Readiness</a>
+          <a href="#help">Help</a>
+        </div>
       </nav>
 
       <section className="hero-grid">
         <div className="hero-copy">
           <div className="section-kicker"><Radar size={16} /> Cygnus cyber intelligence preview</div>
-          <h2>Branded cyber risk intelligence for strategic visibility.</h2>
+          <h2>Cyber risk intelligence for strategic visibility.</h2>
           <p>
-            A separate Cygnus web tracker focused on cyber risk intelligence. This v0.2 clean preview establishes
-            the branded baseline, cyber risk structure, and executive-facing layout before any live threat-feed integration.
+            A separate Cygnus web tracker focused on cyber risk intelligence. This v0.3 preview improves the
+            structure with a cyber watchlist, readiness snapshot, terminology support, and clearer executive navigation.
           </p>
           <div className="hero-actions">
-            <a href="#threat-landscape" className="primary-button">View threat landscape <ChevronRight size={16} /></a>
-            <a href="#cygnus-branding" className="ghost-button">View Cygnus branding</a>
+            <a href="#watchlist" className="primary-button">View cyber watchlist <ChevronRight size={16} /></a>
+            <a href="#help" className="ghost-button">View terminology</a>
           </div>
           <div className="hero-tag-row">
             <span>Strategic cyber monitoring</span>
@@ -198,8 +255,8 @@ function Header() {
           </p>
           <div className="metric-grid">
             <div><strong>4</strong><span>Threat themes</span></div>
+            <div><strong>4</strong><span>Watchlist items</span></div>
             <div><strong>5</strong><span>Sector views</span></div>
-            <div><strong>3</strong><span>Source lanes</span></div>
           </div>
         </div>
       </section>
@@ -254,12 +311,34 @@ function Dashboard() {
         </div>
       </section>
 
+      <section id="watchlist" className="content-section">
+        <div className="section-heading">
+          <div>
+            <div className="section-kicker"><Flame size={16} /> Strategic Watchlist</div>
+            <h2>Priority cyber risk focus areas</h2>
+            <p>Designed as a simple executive scanning layer before live cyber intelligence feeds are added.</p>
+          </div>
+        </div>
+        <div className="watchlist-grid">
+          {watchlist.map((item) => (
+            <article className="watch-card" key={item.title}>
+              <div className="watch-topline">
+                <span>{item.priority}</span>
+                <ClipboardCheck size={20} />
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section id="cygnus-branding" className="content-section">
         <div className="section-heading">
           <div>
             <div className="section-kicker"><Globe2 size={16} /> Cygnus Branding</div>
             <h2>Built as a separate Cygnus cyber tracker</h2>
-            <p>This clean v0.2 baseline gives the cyber tracker its own identity while staying aligned with the wider Cygnus risk intelligence design language.</p>
+            <p>This baseline gives the cyber tracker its own identity while staying aligned with the wider Cygnus risk intelligence design language.</p>
           </div>
         </div>
         <div className="principles-grid">
@@ -297,7 +376,7 @@ function Dashboard() {
         </div>
       </section>
 
-      <section className="split-section">
+      <section id="readiness" className="split-section">
         <div className="panel-card">
           <div className="section-kicker"><Layers3 size={16} /> Sector Exposure</div>
           <h2>Sector risk view</h2>
@@ -314,6 +393,24 @@ function Dashboard() {
           </div>
         </div>
 
+        <div className="panel-card readiness-panel">
+          <div className="section-kicker"><ClipboardCheck size={16} /> Readiness Snapshot</div>
+          <h2>Executive resilience checks</h2>
+          <div className="readiness-list">
+            {readinessItems.map((item) => (
+              <div className="readiness-row" key={item.label}>
+                <div>
+                  <strong>{item.label}</strong>
+                  <span>{item.description}</span>
+                </div>
+                <em>{item.status}</em>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="split-section">
         <div className="panel-card dark-panel">
           <div className="section-kicker"><DatabaseZap size={16} /> Source Architecture</div>
           <h2>Data integration roadmap</h2>
@@ -326,6 +423,19 @@ function Dashboard() {
               <div className="source-item" key={source.name}>
                 <div><strong>{source.name}</strong><span>{source.note}</span></div>
                 <em>{source.status}</em>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div id="help" className="panel-card help-panel">
+          <div className="section-kicker"><CircleHelp size={16} /> Terminology Help</div>
+          <h2>Cyber intelligence terms</h2>
+          <div className="term-list">
+            {terminology.map((item) => (
+              <div className="term-row" key={item.term}>
+                <strong>{item.term}</strong>
+                <span>{item.meaning}</span>
               </div>
             ))}
           </div>
@@ -356,7 +466,7 @@ function Dashboard() {
           <h2>OTX API integration reserved for a later phase</h2>
           <p>
             A later phase can add AlienVault OTX pulses, indicators, malware families, adversary tags, and cyber
-            intelligence summaries. For now, this build locks in the clean branded Cygnus baseline.
+            intelligence summaries. For now, this build improves structure, readability, and cyber-specific decision support.
           </p>
         </div>
         <div className="future-icons">
@@ -377,7 +487,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.2 · Clean branded static preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v0.3 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
