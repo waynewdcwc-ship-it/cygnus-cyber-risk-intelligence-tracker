@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   BadgeCheck,
@@ -200,7 +200,7 @@ function Header() {
         <div className="brand-ribbon-inner">
           <span><BadgeCheck size={14} /> Cygnus Development</span>
           <span>Risk Intelligence Technology</span>
-          <span>Cyber Risk Intelligence Tracker v0.3</span>
+          <span>Cyber Risk Intelligence Tracker v0.4</span>
         </div>
       </div>
 
@@ -216,6 +216,7 @@ function Header() {
           </div>
         </div>
         <div className="nav-links" aria-label="Page navigation">
+          <a href="#otx-live">OTX Preview</a>
           <a href="#watchlist">Watchlist</a>
           <a href="#threat-landscape">Threats</a>
           <a href="#readiness">Readiness</a>
@@ -228,8 +229,8 @@ function Header() {
           <div className="section-kicker"><Radar size={16} /> Cygnus cyber intelligence preview</div>
           <h2>Cyber risk intelligence for strategic visibility.</h2>
           <p>
-            A separate Cygnus web tracker focused on cyber risk intelligence. This v0.3 preview improves the
-            structure with a cyber watchlist, readiness snapshot, terminology support, and clearer executive navigation.
+            A separate Cygnus web tracker focused on cyber risk intelligence. This v0.4 preview adds the first secure OTX API foundation through a Vercel serverless route, while retaining
+            static fallback content, the cyber watchlist, readiness snapshot, and terminology support.
           </p>
           <div className="hero-actions">
             <a href="#watchlist" className="primary-button">View cyber watchlist <ChevronRight size={16} /></a>
@@ -238,14 +239,14 @@ function Header() {
           <div className="hero-tag-row">
             <span>Strategic cyber monitoring</span>
             <span>Executive-friendly design</span>
-            <span>Future API-ready structure</span>
+            <span>Secure OTX foundation</span>
           </div>
         </div>
 
         <div className="hero-card intelligence-card">
           <div className="status-row">
             <span className="pulse-dot" />
-            Static intelligence snapshot
+            Static + OTX-ready snapshot
           </div>
           <h3>Current Cyber Risk Posture</h3>
           <div className="posture-score">Elevated</div>
@@ -287,6 +288,99 @@ function ThreatCard({ item }) {
   );
 }
 
+
+function OtxLivePanel() {
+  const [status, setStatus] = useState('loading');
+  const [message, setMessage] = useState('Checking secure OTX preview route...');
+  const [pulses, setPulses] = useState([]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadPulses() {
+      try {
+        const response = await fetch('/api/otx-pulses');
+        const data = await response.json();
+
+        if (ignore) return;
+
+        if (!response.ok || !data.ok) {
+          setStatus('fallback');
+          setMessage(data.message || 'OTX preview is not available in this environment yet.');
+          setPulses([]);
+          return;
+        }
+
+        setStatus('live');
+        setMessage(data.message || 'OTX preview data loaded through the secure serverless route.');
+        setPulses(data.pulses || []);
+      } catch (error) {
+        if (ignore) return;
+        setStatus('fallback');
+        setMessage('OTX preview is unavailable. Static tracker content remains active.');
+        setPulses([]);
+      }
+    }
+
+    loadPulses();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  return (
+    <section id="otx-live" className="content-section otx-section">
+      <div className="section-heading">
+        <div>
+          <div className="section-kicker"><DatabaseZap size={16} /> Live OTX Foundation</div>
+          <h2>Secure OTX preview route</h2>
+          <p>
+            This panel calls a Vercel serverless function rather than placing the OTX key in the frontend. If the key or
+            API route is unavailable, the tracker safely falls back to static cyber intelligence content.
+          </p>
+        </div>
+        <div className={`otx-status ${status}`}>{status === 'live' ? 'Live route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
+      </div>
+
+      <div className="otx-panel">
+        <div className="otx-summary-card">
+          <div className="status-row"><span className="pulse-dot" /> {message}</div>
+          <h3>OTX API Foundation</h3>
+          <p>
+            The frontend requests <strong>/api/otx-pulses</strong>. The serverless function then adds the private OTX API key
+            on the server side and returns a simplified preview payload for the tracker.
+          </p>
+        </div>
+
+        <div className="otx-pulse-list">
+          {status === 'live' && pulses.length > 0 ? (
+            pulses.map((pulse) => (
+              <article className="otx-pulse-card" key={pulse.id || pulse.name}>
+                <strong>{pulse.name}</strong>
+                <span>{pulse.description || 'No description provided in the preview payload.'}</span>
+                <div className="otx-meta">
+                  <em>{pulse.indicatorCount} indicators</em>
+                  <em>{pulse.modified || 'Modified date unavailable'}</em>
+                </div>
+              </article>
+            ))
+          ) : (
+            <article className="otx-pulse-card static-fallback">
+              <strong>Static fallback active</strong>
+              <span>
+                The tracker remains fully usable while the live OTX route is unavailable locally or while Vercel is waiting
+                for a redeploy with the OTX_API_KEY environment variable.
+              </span>
+              <div className="otx-meta"><em>No API key exposed</em><em>Safe fallback</em></div>
+            </article>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Dashboard() {
   const [selected, setSelected] = useState('All');
   const filteredThreats = useMemo(() => {
@@ -310,6 +404,8 @@ function Dashboard() {
           <div><strong>Strategic lens</strong><span>Business continuity, governance, resilience, and executive awareness</span></div>
         </div>
       </section>
+
+      <OtxLivePanel />
 
       <section id="watchlist" className="content-section">
         <div className="section-heading">
@@ -487,7 +583,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.3 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v0.4 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
