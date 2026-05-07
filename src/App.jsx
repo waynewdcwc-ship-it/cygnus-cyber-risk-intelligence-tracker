@@ -305,7 +305,7 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v1.0 · Executive Cyber Briefing</span>
+          <span>Tracker v1.0.1 · Executive Cyber Briefing</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
@@ -690,6 +690,8 @@ function Dashboard() {
         </div>
       </section>
 
+      <ExecutiveBriefing />
+
       <OtxLivePanel />
 
       <section id="sector-relevance-overview" className="content-section sector-relevance-overview">
@@ -950,7 +952,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v1.0 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v1.0.1.1 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }

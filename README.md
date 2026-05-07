@@ -1,6 +1,10 @@
-# Cygnus Cyber Risk Intelligence Tracker v1.0
+# Cygnus Cyber Risk Intelligence Tracker v1.0.1
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
+
+## v1.0.1 updates
+
+- Fixed Briefing navigation tab by rendering the Executive Cyber Briefing section in the main page flow
 
 ## v1.0 updates
 
