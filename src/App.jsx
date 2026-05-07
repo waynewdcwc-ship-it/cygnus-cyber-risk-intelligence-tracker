@@ -2,6 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   BadgeCheck,
+  UserCheck,
+  SlidersHorizontal,
+  MessageSquareWarning,
+  KeyRound,
+  Bot,
   Brain,
   Bug,
   CheckCircle2,
@@ -106,6 +111,56 @@ const readinessItems = [
   { label: 'Incident roles', status: 'Define', description: 'Clarify decision-makers, technical responders, communications owners, and escalation paths.' }
 ];
 
+const aiPatchingItems = [
+  {
+    title: 'Prompt Injection Exposure',
+    severity: 'High',
+    patchType: 'Prompt / Guardrail',
+    icon: <MessageSquareWarning size={20} />,
+    summary: 'Attackers may attempt to override instructions, manipulate tools, or extract sensitive information through crafted prompts.',
+    actions: ['Harden system prompts', 'Validate user inputs', 'Limit tool access', 'Test common injection patterns']
+  },
+  {
+    title: 'Sensitive Data Leakage',
+    severity: 'High',
+    patchType: 'Data / Access Control',
+    icon: <KeyRound size={20} />,
+    summary: 'AI systems can expose confidential data if retrieval, tool permissions, logging, or redaction rules are not controlled.',
+    actions: ['Review data access', 'Strengthen redaction', 'Limit retrieval scope', 'Monitor unusual outputs']
+  },
+  {
+    title: 'Model Over-Trust',
+    severity: 'Elevated',
+    patchType: 'Human Oversight',
+    icon: <UserCheck size={20} />,
+    summary: 'Users may over-rely on AI outputs for high-impact operational, legal, financial, cyber, or strategic decisions.',
+    actions: ['Add human review', 'Label confidence clearly', 'Restrict autonomous decisions', 'Escalate high-impact outputs']
+  },
+  {
+    title: 'AI Supply Chain Risk',
+    severity: 'Elevated',
+    patchType: 'Vendor / Integration',
+    icon: <Bot size={20} />,
+    summary: 'AI vendors, APIs, plugins, models, browser extensions, and third-party integrations can introduce hidden exposure.',
+    actions: ['Review AI vendors', 'Track integrations', 'Limit plugin permissions', 'Check contractual safeguards']
+  },
+  {
+    title: 'Output Drift or Inconsistency',
+    severity: 'Moderate',
+    patchType: 'Evaluation / Testing',
+    icon: <SlidersHorizontal size={20} />,
+    summary: 'AI behaviour can change across model updates, prompt changes, data shifts, or configuration changes.',
+    actions: ['Retest key workflows', 'Maintain evaluation cases', 'Track model changes', 'Review failure patterns']
+  }
+];
+
+const aiPatchCycle = [
+  { step: 'Identify', detail: 'Find exposed AI workflows, data paths, tools, users, and high-impact decision points.' },
+  { step: 'Contain', detail: 'Restrict risky access, disable unsafe tools, and reduce data exposure while fixes are prepared.' },
+  { step: 'Patch', detail: 'Update prompts, policies, permissions, validation rules, logging, and human review controls.' },
+  { step: 'Verify', detail: 'Retest outputs, review logs, check edge cases, and confirm that the risk has been reduced.' }
+];
+
 const sectorRisk = [
   { sector: 'Financial Services', level: 'High', driver: 'Fraud, ransomware, credential compromise, and third-party exposure' },
   { sector: 'Healthcare', level: 'High', driver: 'Ransomware disruption, sensitive data exposure, and legacy system dependency' },
@@ -201,7 +256,7 @@ function Header() {
         <div className="brand-ribbon-inner">
           <span><BadgeCheck size={14} /> Cygnus Development</span>
           <span>Risk Intelligence Technology</span>
-          <span>Cyber Risk Intelligence Tracker v0.5</span>
+          <span>Cyber Risk Intelligence Tracker v0.6</span>
         </div>
       </div>
 
@@ -219,6 +274,7 @@ function Header() {
         <div className="nav-links" aria-label="Page navigation">
           <a href="#otx-live">OTX Preview</a>
           <a href="#watchlist">Watchlist</a>
+          <a href="#ai-patching">AI Patching</a>
           <a href="#threat-landscape">Threats</a>
           <a href="#readiness">Readiness</a>
           <a href="#help">Help</a>
@@ -421,6 +477,52 @@ function Dashboard() {
 
       <OtxLivePanel />
 
+      <section id="ai-patching" className="content-section ai-patching-section">
+        <div className="section-heading">
+          <div>
+            <div className="section-kicker"><Bot size={16} /> AI Systems Risk & Patching</div>
+            <h2>AI patching for emerging cyber and governance exposure</h2>
+            <p>
+              Tracks practical actions for reducing risk in AI-enabled systems, including prompt hardening, data-access
+              reviews, guardrail updates, output validation, logging improvements, and human-in-the-loop controls.
+            </p>
+          </div>
+        </div>
+
+        <div className="ai-patching-layout">
+          <div className="ai-card-grid">
+            {aiPatchingItems.map((item) => (
+              <article className="ai-patch-card" key={item.title}>
+                <div className="card-topline">
+                  <div className="icon-bubble">{item.icon}</div>
+                  <span className={`risk-pill ${getSeverityClass(item.severity)}`}>{item.severity}</span>
+                </div>
+                <h3>{item.title}</h3>
+                <p>{item.summary}</p>
+                <div className="patch-type">Patch type: <strong>{item.patchType}</strong></div>
+                <div className="signal-list">
+                  {item.actions.map((action) => <span key={action}>{action}</span>)}
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <aside className="ai-cycle-card">
+            <div className="section-kicker"><ShieldCheck size={16} /> AI Patch Cycle</div>
+            <h3>Practical remediation loop</h3>
+            <div className="ai-cycle-list">
+              {aiPatchCycle.map((item) => (
+                <div className="ai-cycle-row" key={item.step}>
+                  <strong>{item.step}</strong>
+                  <span>{item.detail}</span>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </section>
+
+
       <section id="watchlist" className="content-section">
         <div className="section-heading">
           <div>
@@ -597,7 +699,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.5 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v0.6 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
