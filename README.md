@@ -1,8 +1,13 @@
-# Cygnus Cyber Risk Intelligence Tracker v0.6
+# Cygnus Cyber Risk Intelligence Tracker v0.7
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v0.6 updates
+## v0.7 updates
+
+- Aligned landing page theme with the Global Strategic Risk Intelligence Tracker
+- Added white landing-page style with large navy headline and gold italic positioning statement
+- Added rounded version banner, feature cards, and large pill-style action buttons
+- Preserved live OTX feed, OTX source links, and AI Systems Risk & Patching section
 
 - Added AI Systems Risk & Patching section
 - Added AI patching risk cards for prompt injection, sensitive data leakage, model over-trust, AI supply-chain risk, and output drift

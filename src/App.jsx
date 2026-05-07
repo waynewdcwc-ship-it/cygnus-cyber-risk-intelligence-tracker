@@ -17,6 +17,8 @@ import {
   Eye,
   ExternalLink,
   FileWarning,
+  Printer,
+  FileText,
   Flame,
   Globe2,
   Info,
@@ -251,70 +253,64 @@ function getSeverityClass(level) {
 
 function Header() {
   return (
-    <header className="hero-shell">
-      <div className="brand-ribbon">
-        <div className="brand-ribbon-inner">
-          <span><BadgeCheck size={14} /> Cygnus Development</span>
-          <span>Risk Intelligence Technology</span>
-          <span>Cyber Risk Intelligence Tracker v0.6</span>
+    <header className="hero-shell global-style-landing">
+      <div className="global-brand-header">
+        <div>
+          <div className="brand-title">CYGNUS DEVELOPMENT</div>
+          <div className="brand-tagline">RISK INTELLIGENCE TECHNOLOGY</div>
         </div>
       </div>
 
-      <nav className="top-nav">
-        <div className="brand-lockup">
-          <div className="logo-mark">
-            <span>C</span>
-          </div>
-          <div>
-            <p className="eyebrow">CYGNUS DEVELOPMENT</p>
-            <h1>Cyber Risk Intelligence Tracker</h1>
-            <p className="brand-subline">Risk Intelligence Technology</p>
-          </div>
-        </div>
-        <div className="nav-links" aria-label="Page navigation">
-          <a href="#otx-live">OTX Preview</a>
-          <a href="#watchlist">Watchlist</a>
-          <a href="#ai-patching">AI Patching</a>
-          <a href="#threat-landscape">Threats</a>
-          <a href="#readiness">Readiness</a>
-          <a href="#help">Help</a>
-        </div>
+      <nav className="landing-nav">
+        <a href="#watchlist">Watchlist</a>
+        <a href="#otx-live">OTX Feed</a>
+        <a href="#ai-patching">AI Patching</a>
+        <a href="#threat-landscape">Threats</a>
+        <a href="#help">Help</a>
       </nav>
 
-      <section className="hero-grid">
-        <div className="hero-copy">
-          <div className="section-kicker"><Radar size={16} /> Cygnus cyber intelligence preview</div>
-          <h2>Cyber risk intelligence for strategic visibility.</h2>
-          <p>
-            A separate Cygnus web tracker focused on cyber risk intelligence. This v0.4 preview adds the first secure OTX API foundation through a Vercel serverless route, while retaining
-            static fallback content, the cyber watchlist, readiness snapshot, and terminology support.
-          </p>
-          <div className="hero-actions">
-            <a href="#watchlist" className="primary-button">View cyber watchlist <ChevronRight size={16} /></a>
-            <a href="#help" className="ghost-button">View terminology</a>
-          </div>
-          <div className="hero-tag-row">
-            <span>Strategic cyber monitoring</span>
-            <span>Executive-friendly design</span>
-            <span>Secure OTX foundation</span>
-          </div>
+      <section className="landing-hero">
+        <div className="version-banner">
+          <ShieldCheck size={20} />
+          <span>Tracker v0.7 · Global Branding Alignment</span>
         </div>
 
-        <div className="hero-card intelligence-card">
-          <div className="status-row">
-            <span className="pulse-dot" />
-            Static + OTX-ready snapshot
-          </div>
-          <h3>Current Cyber Risk Posture</h3>
-          <div className="posture-score">Elevated</div>
-          <p>
-            Ransomware, phishing, cloud exposure, and software supply-chain compromise remain prominent strategic cyber
-            risk themes for organisations with digitally dependent operations.
-          </p>
-          <div className="metric-grid">
-            <div><strong>4</strong><span>Threat themes</span></div>
-            <div><strong>4</strong><span>Watchlist items</span></div>
-            <div><strong>5</strong><span>Sector views</span></div>
+        <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
+        <p className="hero-statement">Turning cyber uncertainty into structured insight</p>
+        <p className="hero-description">
+          A public preview of the Cygnus cyber risk intelligence framework — now aligned with the visual language of
+          the Global Strategic Risk Intelligence Tracker and enhanced with live OTX source links, AI systems risk
+          patching, strategic watchlists, and executive readiness guidance.
+        </p>
+
+        <div className="landing-feature-stack">
+          <article>
+            <strong>Monitor cyber signals</strong>
+            <span>Track live OTX pulses, priority cyber themes, and emerging risk indicators.</span>
+          </article>
+          <article>
+            <strong>Review AI exposure</strong>
+            <span>Assess AI system risks such as prompt injection, data leakage, model over-trust, and output drift.</span>
+          </article>
+          <article>
+            <strong>Support decisions</strong>
+            <span>Translate technical cyber signals into structured business-risk and resilience priorities.</span>
+          </article>
+        </div>
+
+        <div className="landing-actions">
+          <a href="#otx-live" className="landing-button primary"><Layers3 size={20} /> Explore OTX Feed</a>
+          <a href="#ai-patching" className="landing-button secondary"><FileText size={20} /> View AI Patching</a>
+          <a href="#help" className="landing-button secondary"><CircleHelp size={20} /> Help & Methodology</a>
+          <button className="landing-button disabled" type="button" aria-disabled="true"><Printer size={20} /> Print / Save Briefing</button>
+        </div>
+
+        <div className="snapshot-card">
+          <div className="snapshot-icon"><Radar size={28} /></div>
+          <div>
+            <span>Public Preview Snapshot</span>
+            <strong>Structured cyber risk insight</strong>
+            <p>v0.7 aligns the cyber tracker with the wider Cygnus public-preview style while keeping the live OTX route secure.</p>
           </div>
         </div>
       </section>
@@ -391,9 +387,9 @@ function OtxLivePanel() {
       <div className="section-heading">
         <div>
           <div className="section-kicker"><DatabaseZap size={16} /> Live OTX Feed</div>
-          <h2>OTX feed with source links</h2>
+          <h2>Live cyber source feed</h2>
           <p>
-            This panel calls a secure Vercel serverless function and now provides direct links to the full OTX pulse in a new tab. The dashboard stays clean while the source detail remains accessible.
+            A curated live/open-source preview using a secure Vercel serverless route. Each item links to the full OTX pulse in a new browser tab.
           </p>
         </div>
         <div className={`otx-status ${status}`}>{status === 'live' ? 'Live route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
@@ -699,7 +695,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.6 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v0.7 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
