@@ -26,6 +26,8 @@ import {
   Layers3,
   LockKeyhole,
   Network,
+  BriefcaseBusiness,
+  NotebookPen,
   Radar,
   ScanSearch,
   ShieldAlert,
@@ -272,7 +274,7 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v0.7 · Global Branding Alignment</span>
+          <span>Tracker v0.8 · Cygnus Analyst Notes</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
@@ -310,7 +312,7 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v0.7 aligns the cyber tracker with the wider Cygnus public-preview style while keeping the live OTX route secure.</p>
+            <p>v0.8 adds a Cygnus Analyst Note layer that translates live cyber signals into business-risk and monitoring priorities.</p>
           </div>
         </div>
       </section>
@@ -341,6 +343,57 @@ function ThreatCard({ item }) {
   );
 }
 
+
+
+function buildAnalystNote(pulse) {
+  const text = `${pulse.name || ''} ${pulse.description || ''}`.toLowerCase();
+
+  if (text.includes('ransom') || text.includes('extortion')) {
+    return {
+      relevance: 'Business continuity risk',
+      note: 'This pulse may indicate activity linked to ransomware or extortion. Organisations should review backup recoverability, privileged access, endpoint visibility, and incident escalation readiness.',
+      action: 'Prioritise restore testing, account hardening, and detection of lateral movement or backup deletion attempts.'
+    };
+  }
+
+  if (text.includes('phish') || text.includes('credential') || text.includes('email')) {
+    return {
+      relevance: 'Identity and fraud exposure',
+      note: 'This pulse may relate to credential theft, phishing, or business email compromise. The most relevant business risk is unauthorised access to email, finance workflows, cloud accounts, or privileged systems.',
+      action: 'Review MFA coverage, suspicious inbox rules, impossible-travel alerts, and payment-change approval controls.'
+    };
+  }
+
+  if (text.includes('malware') || text.includes('trojan') || text.includes('loader') || text.includes('backdoor')) {
+    return {
+      relevance: 'Endpoint and persistence risk',
+      note: 'This pulse may indicate malware delivery, persistence, or post-compromise tooling. The business concern is loss of endpoint integrity, data exposure, and possible staging for wider compromise.',
+      action: 'Check endpoint detections, unusual process activity, command-and-control indicators, and recently downloaded files.'
+    };
+  }
+
+  if (text.includes('cve') || text.includes('vulnerab') || text.includes('exploit')) {
+    return {
+      relevance: 'Patch and exposure risk',
+      note: 'This pulse may relate to vulnerability exploitation or exposed systems. The strategic concern is whether internet-facing assets, third-party platforms, or critical applications are vulnerable.',
+      action: 'Review exposed assets, confirm patch status, and prioritise externally reachable systems with privileged access paths.'
+    };
+  }
+
+  if (text.includes('cloud') || text.includes('aws') || text.includes('azure') || text.includes('google cloud')) {
+    return {
+      relevance: 'Cloud control risk',
+      note: 'This pulse may relate to cloud exposure, identity misuse, or misconfiguration. The key risk is unauthorised access to cloud resources, data stores, or administrative consoles.',
+      action: 'Review privileged cloud identities, storage exposure, audit logging, service accounts, and unusual API activity.'
+    };
+  }
+
+  return {
+    relevance: 'Strategic cyber monitoring',
+    note: 'This pulse should be treated as a monitoring signal rather than a standalone conclusion. Review whether the indicators, tactics, or affected technologies overlap with your environment or critical suppliers.',
+    action: 'Compare the pulse against known assets, key vendors, exposed systems, security logs, and current incident priorities.'
+  };
+}
 
 function OtxLivePanel() {
   const [status, setStatus] = useState('loading');
@@ -389,7 +442,7 @@ function OtxLivePanel() {
           <div className="section-kicker"><DatabaseZap size={16} /> Live OTX Feed</div>
           <h2>Live cyber source feed</h2>
           <p>
-            A curated live/open-source preview using a secure Vercel serverless route. Each item links to the full OTX pulse in a new browser tab.
+            A curated live/open-source preview using a secure Vercel serverless route. Each item now includes a Cygnus Analyst Note and links to the full OTX pulse in a new browser tab.
           </p>
         </div>
         <div className={`otx-status ${status}`}>{status === 'live' ? 'Live route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
@@ -400,7 +453,7 @@ function OtxLivePanel() {
           <div className="status-row"><span className="pulse-dot" /> {message}</div>
           <h3>OTX API Foundation</h3>
           <p>
-            The frontend requests <strong>/api/otx-pulses</strong>. The serverless function keeps the private OTX API key on the server side and returns simplified pulse summaries plus source links.
+            The frontend requests <strong>/api/otx-pulses</strong>. The serverless function keeps the private OTX API key on the server side and returns simplified pulse summaries plus source links. The analyst note layer then translates those signals into business-risk language.
           </p>
         </div>
 
@@ -416,6 +469,25 @@ function OtxLivePanel() {
                   <em>{pulse.indicatorCount} indicators</em>
                   <em>{pulse.modified || 'Modified date unavailable'}</em>
                 </div>
+
+                {(() => {
+                  const analystNote = buildAnalystNote(pulse);
+                  return (
+                    <div className="analyst-note-card">
+                      <div className="analyst-note-heading">
+                        <NotebookPen size={16} />
+                        <strong>Cygnus Analyst Note</strong>
+                        <em>{analystNote.relevance}</em>
+                      </div>
+                      <p>{analystNote.note}</p>
+                      <div className="analyst-action">
+                        <BriefcaseBusiness size={15} />
+                        <span><strong>Recommended monitoring action:</strong> {analystNote.action}</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {pulse.url ? (
                   <a
                     className="otx-source-link"
@@ -695,7 +767,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.7 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v0.8 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }

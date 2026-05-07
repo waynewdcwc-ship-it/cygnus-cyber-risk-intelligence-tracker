@@ -1,8 +1,14 @@
-# Cygnus Cyber Risk Intelligence Tracker v0.7
+# Cygnus Cyber Risk Intelligence Tracker v0.8
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v0.7 updates
+## v0.8 updates
+
+- Added Cygnus Analyst Notes under live OTX pulses
+- Added business-risk relevance labels for each OTX item
+- Added recommended monitoring actions beneath each pulse summary
+- Kept OTX full pulse links opening in a new tab
+- Kept AI Systems Risk & Patching section intact
 
 - Aligned landing page theme with the Global Strategic Risk Intelligence Tracker
 - Added white landing-page style with large navy headline and gold italic positioning statement
