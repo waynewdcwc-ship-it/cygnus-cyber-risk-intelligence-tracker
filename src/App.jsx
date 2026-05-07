@@ -17,6 +17,10 @@ import {
   Eye,
   ExternalLink,
   FileWarning,
+  Store,
+  Building2,
+  HeartPulse,
+  Factory,
   Printer,
   FileText,
   Flame,
@@ -274,7 +278,7 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v0.8 · Cygnus Analyst Notes</span>
+          <span>Tracker v0.9 · Sector Relevance Tagging</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
@@ -312,7 +316,7 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v0.8 adds a Cygnus Analyst Note layer that translates live cyber signals into business-risk and monitoring priorities.</p>
+            <p>v0.9 adds sector relevance tagging so cyber signals can be interpreted through a clearer industry-risk lens.</p>
           </div>
         </div>
       </section>
@@ -395,6 +399,50 @@ function buildAnalystNote(pulse) {
   };
 }
 
+
+function buildSectorRelevance(pulse) {
+  const text = `${pulse.name || ''} ${pulse.description || ''}`.toLowerCase();
+
+  const sectors = new Set();
+
+  if (text.includes('bank') || text.includes('finance') || text.includes('payment') || text.includes('invoice') || text.includes('fraud')) {
+    sectors.add('Financial Services');
+  }
+
+  if (text.includes('health') || text.includes('hospital') || text.includes('patient') || text.includes('medical')) {
+    sectors.add('Healthcare');
+  }
+
+  if (text.includes('government') || text.includes('public sector') || text.includes('municipal') || text.includes('state')) {
+    sectors.add('Government');
+  }
+
+  if (text.includes('energy') || text.includes('utility') || text.includes('industrial') || text.includes('ot ') || text.includes('ics') || text.includes('scada')) {
+    sectors.add('Energy & Utilities');
+  }
+
+  if (text.includes('ransom') || text.includes('phish') || text.includes('credential') || text.includes('malware') || text.includes('cve') || text.includes('exploit')) {
+    sectors.add('SME / Mid-market');
+  }
+
+  if (text.includes('cloud') || text.includes('supply') || text.includes('vendor') || text.includes('third-party')) {
+    sectors.add('Technology / Service Providers');
+  }
+
+  const list = Array.from(sectors);
+
+  return list.length > 0 ? list.slice(0, 4) : ['Cross-sector monitoring'];
+}
+
+function getSectorIcon(sector) {
+  if (sector.includes('Financial')) return <Building2 size={14} />;
+  if (sector.includes('Healthcare')) return <HeartPulse size={14} />;
+  if (sector.includes('Government')) return <Landmark size={14} />;
+  if (sector.includes('Energy')) return <Factory size={14} />;
+  if (sector.includes('SME')) return <Store size={14} />;
+  return <Globe2 size={14} />;
+}
+
 function OtxLivePanel() {
   const [status, setStatus] = useState('loading');
   const [message, setMessage] = useState('Checking secure OTX preview route...');
@@ -442,7 +490,7 @@ function OtxLivePanel() {
           <div className="section-kicker"><DatabaseZap size={16} /> Live OTX Feed</div>
           <h2>Live cyber source feed</h2>
           <p>
-            A curated live/open-source preview using a secure Vercel serverless route. Each item now includes a Cygnus Analyst Note and links to the full OTX pulse in a new browser tab.
+            A curated live/open-source preview using a secure Vercel serverless route. Each item includes a Cygnus Analyst Note, sector relevance tags, and a link to the full OTX pulse in a new browser tab.
           </p>
         </div>
         <div className={`otx-status ${status}`}>{status === 'live' ? 'Live route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
@@ -487,6 +535,15 @@ function OtxLivePanel() {
                     </div>
                   );
                 })()}
+
+                <div className="sector-relevance-block">
+                  <strong>Sector relevance</strong>
+                  <div className="sector-tag-row">
+                    {buildSectorRelevance(pulse).map((sector) => (
+                      <span key={sector}>{getSectorIcon(sector)} {sector}</span>
+                    ))}
+                  </div>
+                </div>
 
                 {pulse.url ? (
                   <a
@@ -544,6 +601,42 @@ function Dashboard() {
       </section>
 
       <OtxLivePanel />
+
+      <section id="sector-relevance-overview" className="content-section sector-relevance-overview">
+        <div className="section-heading">
+          <div>
+            <div className="section-kicker"><Layers3 size={16} /> Sector Relevance Layer</div>
+            <h2>Cyber signals mapped to business exposure</h2>
+            <p>
+              v0.9 adds a lightweight sector relevance layer to help users understand whether a cyber signal may be
+              more relevant to financial services, healthcare, government, energy, SMEs, technology providers, or cross-sector monitoring.
+            </p>
+          </div>
+        </div>
+        <div className="sector-explain-grid">
+          <article>
+            <Building2 size={22} />
+            <strong>Financial Services</strong>
+            <span>Fraud, credential theft, payment redirection, and third-party exposure.</span>
+          </article>
+          <article>
+            <HeartPulse size={22} />
+            <strong>Healthcare</strong>
+            <span>Ransomware disruption, sensitive data exposure, and operational dependency.</span>
+          </article>
+          <article>
+            <Landmark size={22} />
+            <strong>Government</strong>
+            <span>Public service disruption, espionage, identity exposure, and citizen trust impact.</span>
+          </article>
+          <article>
+            <Factory size={22} />
+            <strong>Energy & Utilities</strong>
+            <span>Operational technology, critical infrastructure, and geopolitical targeting.</span>
+          </article>
+        </div>
+      </section>
+
 
       <section id="ai-patching" className="content-section ai-patching-section">
         <div className="section-heading">
@@ -767,7 +860,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.8 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v0.9 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }

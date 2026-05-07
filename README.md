@@ -1,8 +1,13 @@
-# Cygnus Cyber Risk Intelligence Tracker v0.8
+# Cygnus Cyber Risk Intelligence Tracker v0.9
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v0.8 updates
+## v0.9 updates
+
+- Added sector relevance tags to live OTX pulse cards
+- Added sector mapping logic for financial services, healthcare, government, energy, SMEs, technology providers, and cross-sector monitoring
+- Added sector relevance overview section
+- Kept Cygnus Analyst Notes, OTX source links, and AI Systems Risk & Patching intact
 
 - Added Cygnus Analyst Notes under live OTX pulses
 - Added business-risk relevance labels for each OTX item
