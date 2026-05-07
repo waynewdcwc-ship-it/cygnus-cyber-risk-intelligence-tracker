@@ -806,3 +806,157 @@ footer p { margin: 0; text-align: right; }
     grid-template-columns: 1fr;
   }
 }
+
+
+.executive-briefing-section {
+  scroll-margin-top: 18px;
+}
+.briefing-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0.9fr;
+  gap: 18px;
+}
+.briefing-hero-card,
+.briefing-priority-card,
+.briefing-actions-card {
+  background: var(--cygnus-panel);
+  border: 1px solid var(--cygnus-border);
+  border-radius: 28px;
+  box-shadow: var(--cygnus-shadow);
+}
+.briefing-hero-card {
+  padding: 30px;
+  background: linear-gradient(180deg, #ffffff, #fff9e8);
+  border-color: #f0dc91;
+}
+.briefing-topline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.briefing-topline span {
+  color: var(--cygnus-muted);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.briefing-topline strong {
+  color: var(--cygnus-navy);
+  font-size: clamp(3rem, 9vw, 5.3rem);
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+}
+.briefing-hero-card p {
+  margin: 24px 0 0;
+  color: var(--cygnus-text);
+  line-height: 1.7;
+  font-size: 1.08rem;
+}
+.briefing-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+.briefing-meta-row em {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #f0dc91;
+  color: var(--cygnus-gold);
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+.briefing-priority-stack {
+  display: grid;
+  gap: 14px;
+}
+.briefing-priority-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 20px;
+}
+.briefing-priority-card svg {
+  color: var(--cygnus-navy);
+  flex-shrink: 0;
+}
+.briefing-priority-card strong {
+  display: block;
+  color: var(--cygnus-navy);
+  font-size: 1.05rem;
+}
+.briefing-priority-card span {
+  display: block;
+  margin-top: 6px;
+  color: var(--cygnus-muted);
+  line-height: 1.55;
+  font-size: 0.94rem;
+}
+.briefing-actions-card {
+  margin-top: 18px;
+  padding: 28px;
+  background: var(--cygnus-navy);
+  color: #fff;
+}
+.briefing-actions-card h3 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+.briefing-action-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+.briefing-action-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.briefing-action-row svg {
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.briefing-action-row span {
+  color: rgba(255,255,255,0.82);
+  line-height: 1.5;
+}
+@media (max-width: 900px) {
+  .briefing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  .landing-nav,
+  .landing-actions,
+  .otx-source-link {
+    display: none !important;
+  }
+  body,
+  .app-shell {
+    background: #ffffff !important;
+  }
+  .hero-shell.global-style-landing,
+  .briefing-hero-card,
+  .briefing-priority-card,
+  .briefing-actions-card,
+  .overview-card,
+  .panel-card,
+  .threat-card,
+  .method-card,
+  .watch-card,
+  .principle-card,
+  .ai-patch-card {
+    box-shadow: none !important;
+  }
+}

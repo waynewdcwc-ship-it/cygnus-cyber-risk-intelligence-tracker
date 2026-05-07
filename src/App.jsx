@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   BadgeCheck,
+  ShieldQuestion,
+  Megaphone,
+  ListChecks,
+  BookOpenCheck,
   UserCheck,
   SlidersHorizontal,
   MessageSquareWarning,
@@ -251,6 +255,28 @@ const brandingPrinciples = [
   }
 ];
 
+
+const executivePriorities = [
+  {
+    title: 'Identity and access control',
+    detail: 'Prioritise MFA coverage, privileged account controls, suspicious sign-in monitoring, and business email compromise prevention.'
+  },
+  {
+    title: 'Resilience against disruption',
+    detail: 'Validate backups, incident escalation roles, restore procedures, endpoint visibility, and communication plans.'
+  },
+  {
+    title: 'AI-enabled system governance',
+    detail: 'Review AI access to sensitive data, harden prompts and guardrails, and define human review for high-impact outputs.'
+  }
+];
+
+const executiveActions = [
+  'Review live OTX pulses for overlap with known assets, vendors, cloud services, and exposed systems.',
+  'Use sector relevance tags to prioritise review for industries and operating environments most likely to be affected.',
+  'Treat AI patching as part of cyber resilience: prompt controls, access limits, logging, validation, and human oversight.'
+];
+
 function getSeverityClass(level) {
   if (level === 'High') return 'risk-high';
   if (level === 'Elevated') return 'risk-elevated';
@@ -268,6 +294,7 @@ function Header() {
       </div>
 
       <nav className="landing-nav">
+        <a href="#executive-briefing">Briefing</a>
         <a href="#watchlist">Watchlist</a>
         <a href="#otx-live">OTX Feed</a>
         <a href="#ai-patching">AI Patching</a>
@@ -278,14 +305,14 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v0.9 · Sector Relevance Tagging</span>
+          <span>Tracker v1.0 · Executive Cyber Briefing</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
         <p className="hero-statement">Turning cyber uncertainty into structured insight</p>
         <p className="hero-description">
           A public preview of the Cygnus cyber risk intelligence framework — now aligned with the visual language of
-          the Global Strategic Risk Intelligence Tracker and enhanced with live OTX source links, AI systems risk
+          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, live OTX source links, AI systems risk
           patching, strategic watchlists, and executive readiness guidance.
         </p>
 
@@ -308,7 +335,7 @@ function Header() {
           <a href="#otx-live" className="landing-button primary"><Layers3 size={20} /> Explore OTX Feed</a>
           <a href="#ai-patching" className="landing-button secondary"><FileText size={20} /> View AI Patching</a>
           <a href="#help" className="landing-button secondary"><CircleHelp size={20} /> Help & Methodology</a>
-          <button className="landing-button disabled" type="button" aria-disabled="true"><Printer size={20} /> Print / Save Briefing</button>
+          <button className="landing-button secondary" type="button" onClick={() => window.print()}><Printer size={20} /> Print / Save Briefing</button>
         </div>
 
         <div className="snapshot-card">
@@ -316,11 +343,74 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v0.9 adds sector relevance tagging so cyber signals can be interpreted through a clearer industry-risk lens.</p>
+            <p>v1.0 adds an executive cyber briefing layer that converts live and static cyber signals into clear posture, priorities, and recommended actions.</p>
           </div>
         </div>
       </section>
     </header>
+  );
+}
+
+
+function ExecutiveBriefing() {
+  return (
+    <section id="executive-briefing" className="content-section executive-briefing-section">
+      <div className="section-heading">
+        <div>
+          <div className="section-kicker"><BookOpenCheck size={16} /> Executive Cyber Briefing</div>
+          <h2>Current cyber risk intelligence summary</h2>
+          <p>
+            A concise executive layer that brings together the live OTX feed, analyst notes, sector relevance, AI systems risk,
+            and operational readiness into one decision-focused view.
+          </p>
+        </div>
+      </div>
+
+      <div className="briefing-grid">
+        <article className="briefing-hero-card">
+          <div className="briefing-topline">
+            <span>Current posture</span>
+            <strong>Elevated</strong>
+          </div>
+          <p>
+            The current cyber risk posture remains elevated due to persistent ransomware, credential compromise,
+            exposed systems, third-party dependency, and the growing governance challenge of AI-enabled systems.
+          </p>
+          <div className="briefing-meta-row">
+            <em>Live OTX feed active where configured</em>
+            <em>Analyst notes enabled</em>
+            <em>Sector relevance enabled</em>
+          </div>
+        </article>
+
+        <div className="briefing-priority-stack">
+          {executivePriorities.map((item) => (
+            <article className="briefing-priority-card" key={item.title}>
+              <ShieldQuestion size={20} />
+              <div>
+                <strong>{item.title}</strong>
+                <span>{item.detail}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="briefing-actions-card">
+        <div>
+          <div className="section-kicker"><ListChecks size={16} /> Recommended Executive Actions</div>
+          <h3>Priority actions for the next review cycle</h3>
+        </div>
+        <div className="briefing-action-list">
+          {executiveActions.map((action) => (
+            <div className="briefing-action-row" key={action}>
+              <Megaphone size={17} />
+              <span>{action}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -860,7 +950,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v0.9 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v1.0 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
