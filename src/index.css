@@ -960,3 +960,193 @@ footer p { margin: 0; text-align: right; }
     box-shadow: none !important;
   }
 }
+
+
+.cyber-insurance-section {
+  scroll-margin-top: 18px;
+}
+.insurance-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  padding: 30px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #ffffff, #fff9e8);
+  border: 1px solid #f0dc91;
+  box-shadow: var(--cygnus-shadow);
+  margin-bottom: 18px;
+}
+.insurance-hero-card span {
+  display: block;
+  color: var(--cygnus-gold);
+  font-size: 0.88rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+.insurance-hero-card strong {
+  display: block;
+  color: var(--cygnus-navy);
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+.insurance-hero-card p {
+  margin: 18px 0 0;
+  color: var(--cygnus-text);
+  line-height: 1.65;
+  max-width: 820px;
+}
+.insurance-icon-stack {
+  display: grid;
+  grid-template-columns: repeat(3, 58px);
+  gap: 10px;
+}
+.insurance-icon-stack svg {
+  width: 58px;
+  height: 58px;
+  padding: 15px;
+  border-radius: 20px;
+  background: #ffffff;
+  color: var(--cygnus-navy);
+  box-shadow: 0 10px 24px rgba(7,26,47,0.08);
+}
+.insurance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.insurance-card,
+.insurance-panel {
+  background: var(--cygnus-panel);
+  border: 1px solid var(--cygnus-border);
+  border-radius: 28px;
+  box-shadow: var(--cygnus-shadow);
+}
+.insurance-card {
+  padding: 24px;
+}
+.insurance-card-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #eef4ff;
+  color: var(--cygnus-navy);
+}
+.insurance-card h3 {
+  margin: 18px 0 9px;
+  color: var(--cygnus-navy);
+  font-size: 1.18rem;
+}
+.insurance-card p {
+  margin: 0;
+  color: var(--cygnus-muted);
+  line-height: 1.58;
+  font-size: 0.92rem;
+}
+.insurance-focus-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 16px;
+}
+.insurance-focus-row span {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: var(--cygnus-panel-soft);
+  border: 1px solid var(--cygnus-border);
+  color: var(--cygnus-navy);
+  font-weight: 850;
+  font-size: 0.76rem;
+}
+.insurance-split {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+.insurance-panel {
+  padding: 28px;
+}
+.insurance-panel h3 {
+  margin: 0;
+  color: var(--cygnus-navy);
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+.insurance-checklist,
+.broker-question-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+.insurance-check-row,
+.broker-question-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--cygnus-panel-soft);
+  border: 1px solid var(--cygnus-border);
+}
+.insurance-check-row svg,
+.broker-question-row svg {
+  color: var(--cygnus-gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.insurance-check-row span,
+.broker-question-row span {
+  color: var(--cygnus-text);
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+.broker-panel {
+  background: var(--cygnus-navy);
+  color: #fff;
+}
+.broker-panel h3 {
+  color: #fff;
+}
+.broker-panel .section-kicker {
+  color: #fff;
+}
+.broker-panel .broker-question-row {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.broker-panel .broker-question-row svg {
+  color: #fff;
+}
+.broker-panel .broker-question-row span {
+  color: rgba(255,255,255,0.84);
+}
+@media (max-width: 1000px) {
+  .insurance-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .insurance-split,
+  .insurance-hero-card {
+    grid-template-columns: 1fr;
+  }
+  .insurance-icon-stack {
+    grid-template-columns: repeat(3, 58px);
+  }
+}
+@media (max-width: 640px) {
+  .insurance-grid {
+    grid-template-columns: 1fr;
+  }
+  .insurance-icon-stack {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .insurance-icon-stack svg {
+    width: 100%;
+  }
+}

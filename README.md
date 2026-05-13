@@ -1,8 +1,14 @@
-# Cygnus Cyber Risk Intelligence Tracker v1.0.1
+# Cygnus Cyber Risk Intelligence Tracker v1.1
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v1.0.1 updates
+## v1.1 updates
+
+- Added Cyber Insurance & Risk Transfer section
+- Added coverage cards for incident response, ransomware/extortion, business interruption, and cyber crime/social engineering
+- Added insurance readiness checklist
+- Added broker/insurer questions panel
+- Preserved Executive Cyber Briefing, live OTX feed, analyst notes, sector relevance, AI patching, and Global Tracker-style branding
 
 - Fixed Briefing navigation tab by rendering the Executive Cyber Briefing section in the main page flow
 

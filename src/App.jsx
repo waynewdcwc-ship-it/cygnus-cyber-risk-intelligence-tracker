@@ -40,6 +40,13 @@ import {
   ScanSearch,
   ShieldAlert,
   ShieldCheck,
+  CircleDollarSign,
+  Scale,
+  CloudCog,
+  Handshake,
+  FileCheck2,
+  Banknote,
+  ShieldPlus,
   Siren,
   Target,
   TrendingUp,
@@ -256,6 +263,51 @@ const brandingPrinciples = [
 ];
 
 
+const insuranceCoverageItems = [
+  {
+    title: 'Incident response and recovery',
+    icon: <ShieldPlus size={22} />,
+    summary: 'Cyber policies may support forensic investigation, legal advice, breach response, crisis communications, notification costs, and specialist recovery support.',
+    focus: ['Digital forensics', 'Legal support', 'Crisis communications', 'Data restoration']
+  },
+  {
+    title: 'Ransomware and extortion',
+    icon: <Banknote size={22} />,
+    summary: 'Policies may address extortion response, negotiation support, recovery costs, and business interruption, subject to policy wording, legality, exclusions, and sublimits.',
+    focus: ['Extortion response', 'Restoration costs', 'Downtime losses', 'Policy sublimits']
+  },
+  {
+    title: 'Business interruption',
+    icon: <CloudCog size={22} />,
+    summary: 'Cover may apply where a cyber incident disrupts operations, customer portals, production systems, cloud services, logistics, payment flows, or other critical technology dependencies.',
+    focus: ['Lost income', 'Extra expense', 'Cloud dependency', 'Supplier disruption']
+  },
+  {
+    title: 'Cyber crime and social engineering',
+    icon: <CircleDollarSign size={22} />,
+    summary: 'Some policies or extensions may address invoice redirection, business email compromise, fraudulent payment instructions, and credential-enabled financial loss.',
+    focus: ['BEC fraud', 'Invoice redirection', 'Funds transfer loss', 'Approval controls']
+  }
+];
+
+const insuranceReadinessItems = [
+  'Multi-factor authentication for email, cloud, VPN, finance, and privileged accounts',
+  'Offline or isolated backups with tested restoration capability',
+  'Patch management for exposed systems, critical applications, and third-party platforms',
+  'Endpoint detection, logging, and incident response escalation procedures',
+  'Privileged access controls and joiner/mover/leaver access reviews',
+  'Vendor and cloud dependency mapping for critical service providers'
+];
+
+const brokerQuestions = [
+  'Does the policy cover ransomware, extortion support, restoration costs, and business interruption?',
+  'Are ransom payments covered only where lawful, and are there any specific sublimits?',
+  'Does the wording cover cloud outages, managed service provider incidents, or software supply-chain disruption?',
+  'Does the policy cover business email compromise, social engineering fraud, and invoice redirection?',
+  'Are AI-related cyber incidents excluded, sublimited, or subject to additional underwriting requirements?',
+  'Which incident response vendors must be used, and what notification timelines apply after discovery?'
+];
+
 const executivePriorities = [
   {
     title: 'Identity and access control',
@@ -295,6 +347,7 @@ function Header() {
 
       <nav className="landing-nav">
         <a href="#executive-briefing">Briefing</a>
+        <a href="#cyber-insurance">Insurance</a>
         <a href="#watchlist">Watchlist</a>
         <a href="#otx-live">OTX Feed</a>
         <a href="#ai-patching">AI Patching</a>
@@ -305,15 +358,15 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v1.0.1 · Executive Cyber Briefing</span>
+          <span>Tracker v1.1 · Cyber Insurance & Risk Transfer</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
         <p className="hero-statement">Turning cyber uncertainty into structured insight</p>
         <p className="hero-description">
           A public preview of the Cygnus cyber risk intelligence framework — now aligned with the visual language of
-          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, live OTX source links, AI systems risk
-          patching, strategic watchlists, and executive readiness guidance.
+          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, cyber insurance and risk transfer guidance, live OTX source links,
+          AI systems risk patching, strategic watchlists, and executive readiness guidance.
         </p>
 
         <div className="landing-feature-stack">
@@ -343,7 +396,7 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v1.0 adds an executive cyber briefing layer that converts live and static cyber signals into clear posture, priorities, and recommended actions.</p>
+            <p>v1.1 adds a dedicated cyber insurance and risk transfer layer covering financial resilience, policy considerations, readiness controls, and broker questions.</p>
           </div>
         </div>
       </section>
@@ -351,6 +404,82 @@ function Header() {
   );
 }
 
+
+function CyberInsuranceSection() {
+  return (
+    <section id="cyber-insurance" className="content-section cyber-insurance-section">
+      <div className="section-heading">
+        <div>
+          <div className="section-kicker"><ShieldPlus size={16} /> Cyber Insurance & Risk Transfer</div>
+          <h2>Financial resilience against cyber incidents</h2>
+          <p>
+            Cyber insurance does not replace cybersecurity controls, but it can help organisations manage the financial
+            impact of cyber incidents, including response costs, business interruption, ransomware events, data breaches,
+            cyber crime, and third-party technology disruption.
+          </p>
+        </div>
+      </div>
+
+      <div className="insurance-hero-card">
+        <div>
+          <span>Risk transfer lens</span>
+          <strong>Insurance is part of resilience, not a substitute for controls.</strong>
+          <p>
+            The strongest cyber risk posture combines prevention, detection, response readiness, recovery capability,
+            and carefully reviewed insurance cover. Policy wording, exclusions, sublimits, and required security controls
+            should be checked before an incident occurs.
+          </p>
+        </div>
+        <div className="insurance-icon-stack">
+          <FileCheck2 />
+          <Handshake />
+          <Scale />
+        </div>
+      </div>
+
+      <div className="insurance-grid">
+        {insuranceCoverageItems.map((item) => (
+          <article className="insurance-card" key={item.title}>
+            <div className="insurance-card-icon">{item.icon}</div>
+            <h3>{item.title}</h3>
+            <p>{item.summary}</p>
+            <div className="insurance-focus-row">
+              {item.focus.map((focus) => <span key={focus}>{focus}</span>)}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="insurance-split">
+        <article className="insurance-panel">
+          <div className="section-kicker"><FileCheck2 size={16} /> Insurance Readiness Checklist</div>
+          <h3>Controls insurers commonly expect</h3>
+          <div className="insurance-checklist">
+            {insuranceReadinessItems.map((item) => (
+              <div className="insurance-check-row" key={item}>
+                <ShieldCheck size={16} />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="insurance-panel broker-panel">
+          <div className="section-kicker"><Handshake size={16} /> Broker / Insurer Questions</div>
+          <h3>Questions to ask before relying on the policy</h3>
+          <div className="broker-question-list">
+            {brokerQuestions.map((question) => (
+              <div className="broker-question-row" key={question}>
+                <Scale size={16} />
+                <span>{question}</span>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
 
 function ExecutiveBriefing() {
   return (
@@ -692,6 +821,8 @@ function Dashboard() {
 
       <ExecutiveBriefing />
 
+      <CyberInsuranceSection />
+
       <OtxLivePanel />
 
       <section id="sector-relevance-overview" className="content-section sector-relevance-overview">
@@ -952,7 +1083,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v1.0.1.1 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v1.1.1 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
