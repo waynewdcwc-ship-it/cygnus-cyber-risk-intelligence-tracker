@@ -1,8 +1,14 @@
-# Cygnus Cyber Risk Intelligence Tracker v1.1
+# Cygnus Cyber Risk Intelligence Tracker v1.2
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v1.1 updates
+## v1.2 updates
+
+- Added NCSC Advisory & Guidance Layer
+- Added static guidance cards for reports/advisories, threat reports, early warning concept, and mitigation guidance
+- Added advisory action checklist
+- Added future live NCSC RSS feed phase panel
+- Preserved Cyber Insurance & Risk Transfer, Executive Cyber Briefing, live OTX feed, analyst notes, sector relevance, AI patching, and Global Tracker-style branding
 
 - Added Cyber Insurance & Risk Transfer section
 - Added coverage cards for incident response, ransomware/extortion, business interruption, and cyber crime/social engineering

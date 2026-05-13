@@ -34,6 +34,10 @@ import {
   Layers3,
   LockKeyhole,
   Network,
+  BellRing,
+  BookMarked,
+  RadioTower,
+  Newspaper,
   BriefcaseBusiness,
   NotebookPen,
   Radar,
@@ -263,6 +267,49 @@ const brandingPrinciples = [
 ];
 
 
+const ncscGuidanceItems = [
+  {
+    title: 'Reports & Advisories',
+    icon: <Newspaper size={22} />,
+    summary: 'Official advisory-style updates can help organisations understand exploitation campaigns, vulnerability alerts, threat actor activity, and priority mitigation themes.',
+    riskLens: 'Use advisories to validate whether the organisation, its suppliers, or its critical technologies may be affected.'
+  },
+  {
+    title: 'Threat Reports',
+    icon: <RadioTower size={22} />,
+    summary: 'Threat reports provide a higher-level picture of emerging cyber activity, attack patterns, and strategic cyber risk trends.',
+    riskLens: 'Use threat reports to brief executives, adjust monitoring priorities, and support cyber risk horizon scanning.'
+  },
+  {
+    title: 'Early Warning Concept',
+    icon: <BellRing size={22} />,
+    summary: 'Early warning capability focuses on alerting organisations to network abuse, potential incidents, exposed services, vulnerabilities, or other signs of external cyber exposure.',
+    riskLens: 'Use this concept to strengthen attack-surface awareness, external exposure monitoring, and incident escalation readiness.'
+  },
+  {
+    title: 'Mitigation Guidance',
+    icon: <BookMarked size={22} />,
+    summary: 'Practical guidance supports controls such as logging, monitoring, patching, access control, incident response, cloud security, and secure configuration.',
+    riskLens: 'Use mitigation guidance to strengthen readiness, support insurance control evidence, and prioritise remediation actions.'
+  }
+];
+
+const ncscActionChecklist = [
+  'Monitor official advisories for affected technologies, known exploited vulnerabilities, and recommended mitigations.',
+  'Compare advisory themes with live OTX pulses, sector relevance tags, and known organisational exposure.',
+  'Review whether affected systems are internet-facing, business-critical, supplier-managed, or linked to privileged access.',
+  'Use guidance themes to strengthen cyber insurance readiness evidence, including MFA, backups, logging, and patching.',
+  'Escalate high-impact advisories into executive cyber briefing, incident response planning, and board-level risk reporting.'
+];
+
+const ncscFutureIntegrations = [
+  'Live NCSC RSS feed for reports and advisories',
+  'Cygnus analyst notes for advisory items',
+  'Sector relevance tagging for official advisories',
+  'Readiness and insurance impact mapping',
+  'Links to full official NCSC guidance pages'
+];
+
 const insuranceCoverageItems = [
   {
     title: 'Incident response and recovery',
@@ -347,6 +394,7 @@ function Header() {
 
       <nav className="landing-nav">
         <a href="#executive-briefing">Briefing</a>
+        <a href="#ncsc-guidance">NCSC Guidance</a>
         <a href="#cyber-insurance">Insurance</a>
         <a href="#watchlist">Watchlist</a>
         <a href="#otx-live">OTX Feed</a>
@@ -358,15 +406,15 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v1.1 · Cyber Insurance & Risk Transfer</span>
+          <span>Tracker v1.2 · NCSC Advisory & Guidance Layer</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
         <p className="hero-statement">Turning cyber uncertainty into structured insight</p>
         <p className="hero-description">
           A public preview of the Cygnus cyber risk intelligence framework — now aligned with the visual language of
-          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, cyber insurance and risk transfer guidance, live OTX source links,
-          AI systems risk patching, strategic watchlists, and executive readiness guidance.
+          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, NCSC-style advisory guidance, cyber insurance and risk transfer guidance,
+          live OTX source links, AI systems risk patching, strategic watchlists, and executive readiness guidance.
         </p>
 
         <div className="landing-feature-stack">
@@ -396,7 +444,7 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v1.1 adds a dedicated cyber insurance and risk transfer layer covering financial resilience, policy considerations, readiness controls, and broker questions.</p>
+            <p>v1.2 adds an NCSC advisory and guidance layer to connect official cyber guidance with business risk, readiness, insurance, and sector relevance.</p>
           </div>
         </div>
       </section>
@@ -404,6 +452,86 @@ function Header() {
   );
 }
 
+
+function NcscGuidanceSection() {
+  return (
+    <section id="ncsc-guidance" className="content-section ncsc-guidance-section">
+      <div className="section-heading">
+        <div>
+          <div className="section-kicker"><BookMarked size={16} /> NCSC Advisory & Guidance Layer</div>
+          <h2>Official guidance translated into cyber risk priorities</h2>
+          <p>
+            This static v1.2 layer introduces an NCSC-style advisory and guidance framework. It is designed to sit
+            alongside the live OTX feed by adding an official-guidance perspective on cyber risk, readiness, mitigation,
+            incident response, and executive decision-making.
+          </p>
+        </div>
+      </div>
+
+      <div className="ncsc-hero-card">
+        <div>
+          <span>Authoritative guidance lens</span>
+          <strong>Use official advisories to validate exposure and prioritise response.</strong>
+          <p>
+            OTX provides live threat intelligence signals. NCSC-style guidance adds a more formal advisory and mitigation
+            layer. Cygnus connects both into business impact, sector relevance, insurance readiness, and executive action.
+          </p>
+        </div>
+        <a
+          className="ncsc-source-button"
+          href="https://www.ncsc.gov.uk/section/keep-up-to-date/reports-advisories"
+          target="_blank"
+          rel="noreferrer"
+        >
+          View NCSC advisories <ExternalLink size={16} />
+        </a>
+      </div>
+
+      <div className="ncsc-grid">
+        {ncscGuidanceItems.map((item) => (
+          <article className="ncsc-card" key={item.title}>
+            <div className="ncsc-card-icon">{item.icon}</div>
+            <h3>{item.title}</h3>
+            <p>{item.summary}</p>
+            <div className="ncsc-risk-lens">
+              <strong>Cygnus risk lens:</strong>
+              <span>{item.riskLens}</span>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="ncsc-split">
+        <article className="ncsc-panel">
+          <div className="section-kicker"><ShieldCheck size={16} /> Advisory Action Checklist</div>
+          <h3>How to use official guidance in the tracker</h3>
+          <div className="ncsc-action-list">
+            {ncscActionChecklist.map((item) => (
+              <div className="ncsc-action-row" key={item}>
+                <CheckCircle2 size={16} />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="ncsc-panel future-ncsc-panel">
+          <div className="section-kicker"><DatabaseZap size={16} /> Future Live Feed Phase</div>
+          <h3>Reserved for v1.3+</h3>
+          <p>
+            The next phase can add a lightweight serverless RSS route for NCSC reports and advisories. This would
+            not require an API key and would complement the existing OTX feed.
+          </p>
+          <div className="ncsc-future-list">
+            {ncscFutureIntegrations.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
 
 function CyberInsuranceSection() {
   return (
@@ -821,6 +949,8 @@ function Dashboard() {
 
       <ExecutiveBriefing />
 
+      <NcscGuidanceSection />
+
       <CyberInsuranceSection />
 
       <OtxLivePanel />
@@ -1083,7 +1213,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v1.1.1 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v1.2.1 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
