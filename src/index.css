@@ -1344,3 +1344,60 @@ footer p { margin: 0; text-align: right; }
     width: 100%;
   }
 }
+
+
+.ncsc-live-section {
+  scroll-margin-top: 18px;
+}
+.ncsc-live-panel {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 18px;
+}
+.ncsc-live-summary {
+  padding: 24px;
+  background: #eef4ff;
+  border: 1px solid var(--cygnus-border);
+  border-radius: 28px;
+  box-shadow: var(--cygnus-shadow);
+}
+.ncsc-live-summary h3 {
+  color: var(--cygnus-navy);
+  font-size: 1.45rem;
+  margin: 20px 0 10px;
+}
+.ncsc-live-summary p {
+  color: var(--cygnus-muted);
+  line-height: 1.6;
+}
+.ncsc-feed-list {
+  display: grid;
+  gap: 14px;
+}
+.ncsc-feed-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid var(--cygnus-border);
+  box-shadow: var(--cygnus-shadow);
+}
+.ncsc-feed-card strong {
+  display: block;
+  color: var(--cygnus-navy);
+}
+.ncsc-feed-card span {
+  display: block;
+  color: var(--cygnus-muted);
+  font-size: 0.92rem;
+  margin-top: 5px;
+  line-height: 1.5;
+}
+@media (max-width: 1000px) {
+  .ncsc-live-panel {
+    grid-template-columns: 1fr;
+  }
+}

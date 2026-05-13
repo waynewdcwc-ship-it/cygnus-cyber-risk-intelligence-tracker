@@ -41,6 +41,8 @@ import {
   BriefcaseBusiness,
   NotebookPen,
   Radar,
+  RefreshCcw,
+  Rss,
   ScanSearch,
   ShieldAlert,
   ShieldCheck,
@@ -394,6 +396,7 @@ function Header() {
 
       <nav className="landing-nav">
         <a href="#executive-briefing">Briefing</a>
+        <a href="#ncsc-live">NCSC Feed</a>
         <a href="#ncsc-guidance">NCSC Guidance</a>
         <a href="#cyber-insurance">Insurance</a>
         <a href="#watchlist">Watchlist</a>
@@ -406,14 +409,14 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v1.2 · NCSC Advisory & Guidance Layer</span>
+          <span>Tracker v1.3 · Live NCSC RSS Feed</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
         <p className="hero-statement">Turning cyber uncertainty into structured insight</p>
         <p className="hero-description">
           A public preview of the Cygnus cyber risk intelligence framework — now aligned with the visual language of
-          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, NCSC-style advisory guidance, cyber insurance and risk transfer guidance,
+          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, live NCSC advisory feed, cyber insurance and risk transfer guidance,
           live OTX source links, AI systems risk patching, strategic watchlists, and executive readiness guidance.
         </p>
 
@@ -444,7 +447,7 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v1.2 adds an NCSC advisory and guidance layer to connect official cyber guidance with business risk, readiness, insurance, and sector relevance.</p>
+            <p>v1.3 adds a live NCSC RSS feed route for official reports and advisory updates, alongside the existing OTX source feed.</p>
           </div>
         </div>
       </section>
@@ -452,6 +455,165 @@ function Header() {
   );
 }
 
+
+
+function buildNcscAnalystNote(item) {
+  const text = `${item.title || ''} ${item.summary || ''}`.toLowerCase();
+
+  if (text.includes('vulnerab') || text.includes('cve') || text.includes('patch') || text.includes('exploit')) {
+    return {
+      relevance: 'Patch and exposure risk',
+      action: 'Check whether the affected technology exists in your environment or supply chain, then prioritise exposed and business-critical systems.'
+    };
+  }
+
+  if (text.includes('ransom') || text.includes('malware')) {
+    return {
+      relevance: 'Operational disruption risk',
+      action: 'Review backup recoverability, endpoint visibility, incident response roles, and critical process recovery plans.'
+    };
+  }
+
+  if (text.includes('phish') || text.includes('messaging') || text.includes('credential') || text.includes('account')) {
+    return {
+      relevance: 'Identity and user-targeting risk',
+      action: 'Review MFA coverage, suspicious sign-in monitoring, inbox rules, user awareness, and high-risk account protections.'
+    };
+  }
+
+  if (text.includes('router') || text.includes('vpn') || text.includes('firewall') || text.includes('edge')) {
+    return {
+      relevance: 'Internet-facing infrastructure risk',
+      action: 'Validate external exposure, firmware status, administrative access controls, and monitoring for edge-device compromise.'
+    };
+  }
+
+  return {
+    relevance: 'Official advisory monitoring',
+    action: 'Compare the advisory theme against critical assets, key vendors, exposed services, and current executive cyber priorities.'
+  };
+}
+
+
+function NcscLivePanel() {
+  const [status, setStatus] = useState('loading');
+  const [message, setMessage] = useState('Checking live NCSC RSS route...');
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadNcscFeed() {
+      try {
+        const response = await fetch('/api/ncsc-feed');
+        const data = await response.json();
+
+        if (ignore) return;
+
+        if (!response.ok || !data.ok) {
+          setStatus('fallback');
+          setMessage(data.message || 'NCSC RSS feed is not available in this environment yet.');
+          setItems([]);
+          return;
+        }
+
+        setStatus('live');
+        setMessage(data.message || 'NCSC RSS feed loaded through the serverless route.');
+        setItems(data.items || []);
+      } catch (error) {
+        if (ignore) return;
+        setStatus('fallback');
+        setMessage('NCSC RSS preview is unavailable. Static guidance remains active.');
+        setItems([]);
+      }
+    }
+
+    loadNcscFeed();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  return (
+    <section id="ncsc-live" className="content-section ncsc-live-section">
+      <div className="section-heading">
+        <div>
+          <div className="section-kicker"><Rss size={16} /> Live NCSC RSS Feed</div>
+          <h2>Official reports and advisory updates</h2>
+          <p>
+            This panel loads NCSC reports and advisory updates through a lightweight Vercel serverless route. It does
+            not require an API key and complements the existing OTX feed with an official guidance source.
+          </p>
+        </div>
+        <div className={`otx-status ${status}`}>{status === 'live' ? 'Live NCSC route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
+      </div>
+
+      <div className="ncsc-live-panel">
+        <div className="ncsc-live-summary">
+          <div className="status-row"><span className="pulse-dot" /> {message}</div>
+          <h3>NCSC RSS Foundation</h3>
+          <p>
+            The frontend requests <strong>/api/ncsc-feed</strong>. The serverless function fetches the public NCSC
+            reports/advisories RSS feed and returns simplified items for the tracker.
+          </p>
+        </div>
+
+        <div className="ncsc-feed-list">
+          {status === 'live' && items.length > 0 ? (
+            items.map((item) => {
+              const note = buildNcscAnalystNote(item);
+              return (
+                <article className="ncsc-feed-card" key={item.link || item.title}>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <span>{item.summary || 'No summary provided in the RSS preview payload.'}</span>
+                  </div>
+                  <div className="otx-meta">
+                    <em>{item.pubDate || 'Publish date unavailable'}</em>
+                    <em>{item.source || 'NCSC'}</em>
+                  </div>
+
+                  <div className="analyst-note-card">
+                    <div className="analyst-note-heading">
+                      <NotebookPen size={16} />
+                      <strong>Cygnus Analyst Note</strong>
+                      <em>{note.relevance}</em>
+                    </div>
+                    <p>{note.action}</p>
+                  </div>
+
+                  {item.link ? (
+                    <a
+                      className="otx-source-link"
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Open full NCSC item for ${item.title}`}
+                    >
+                      View full NCSC item <ExternalLink size={14} />
+                    </a>
+                  ) : (
+                    <span className="otx-source-link disabled">Source link unavailable</span>
+                  )}
+                </article>
+              );
+            })
+          ) : (
+            <article className="ncsc-feed-card static-fallback">
+              <strong>Static NCSC guidance active</strong>
+              <span>
+                The tracker remains fully usable while the live NCSC RSS route is unavailable. The static advisory
+                and guidance layer below remains active.
+              </span>
+              <div className="otx-meta"><em>No API key required</em><em>Safe fallback</em></div>
+            </article>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function NcscGuidanceSection() {
   return (
@@ -517,10 +679,9 @@ function NcscGuidanceSection() {
 
         <article className="ncsc-panel future-ncsc-panel">
           <div className="section-kicker"><DatabaseZap size={16} /> Future Live Feed Phase</div>
-          <h3>Reserved for v1.3+</h3>
+          <h3>Now live in v1.3</h3>
           <p>
-            The next phase can add a lightweight serverless RSS route for NCSC reports and advisories. This would
-            not require an API key and would complement the existing OTX feed.
+            v1.3 adds a lightweight serverless RSS route for NCSC reports and advisories. It does not require an API key and complements the existing OTX feed.
           </p>
           <div className="ncsc-future-list">
             {ncscFutureIntegrations.map((item) => (
@@ -949,6 +1110,8 @@ function Dashboard() {
 
       <ExecutiveBriefing />
 
+      <NcscLivePanel />
+
       <NcscGuidanceSection />
 
       <CyberInsuranceSection />
@@ -1213,7 +1376,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v1.2.1 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v1.3.1 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
