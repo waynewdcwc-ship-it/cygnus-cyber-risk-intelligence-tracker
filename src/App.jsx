@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import {
   Activity,
   BadgeCheck,
@@ -34,6 +35,9 @@ import {
   Layers3,
   LockKeyhole,
   Network,
+  MousePointerClick,
+  LocateFixed,
+  MapPinned,
   BellRing,
   BookMarked,
   RadioTower,
@@ -269,6 +273,85 @@ const brandingPrinciples = [
 ];
 
 
+const cyberMapMarkers = [
+  {
+    region: 'United Kingdom',
+    coordinates: [54.5, -2.5],
+    riskLevel: 'Elevated',
+    category: 'Advisory concentration',
+    sourceBasis: 'NCSC Reports & Advisories',
+    sectors: ['Government', 'Financial Services', 'SME / Mid-market'],
+    analystNote: 'Monitor official guidance affecting internet-facing systems, identity controls, cloud services, and supplier dependencies.',
+    recommendedAction: 'Use NCSC items to validate exposure, patch priorities, and readiness controls for UK-linked operations or suppliers.'
+  },
+  {
+    region: 'Europe',
+    coordinates: [50.8, 10.4],
+    riskLevel: 'Elevated',
+    category: 'Ransomware / supply-chain exposure',
+    sourceBasis: 'OTX + NCSC monitoring',
+    sectors: ['Healthcare', 'Government', 'Technology / Service Providers'],
+    analystNote: 'European organisations remain exposed to ransomware, supplier compromise, and regulatory pressure around data protection and resilience.',
+    recommendedAction: 'Review backup recovery, vendor dependencies, endpoint visibility, and incident communication planning.'
+  },
+  {
+    region: 'North America',
+    coordinates: [39.5, -98.35],
+    riskLevel: 'Elevated',
+    category: 'Credential theft / cloud exposure',
+    sourceBasis: 'OTX pulse monitoring',
+    sectors: ['Financial Services', 'Technology / Service Providers', 'SME / Mid-market'],
+    analystNote: 'Cloud identity compromise, phishing, and business email compromise remain key pathways to financial and operational loss.',
+    recommendedAction: 'Prioritise MFA coverage, suspicious sign-in monitoring, privileged cloud accounts, and payment-change controls.'
+  },
+  {
+    region: 'Middle East',
+    coordinates: [29.3, 47.7],
+    riskLevel: 'High',
+    category: 'Geopolitical cyber watch',
+    sourceBasis: 'Strategic cyber monitoring',
+    sectors: ['Energy & Utilities', 'Government', 'Financial Services'],
+    analystNote: 'Geopolitical tensions can increase cyber targeting of government, energy, financial, and critical infrastructure entities.',
+    recommendedAction: 'Strengthen monitoring for edge-device exposure, phishing themes, destructive malware signals, and supplier disruption.'
+  },
+  {
+    region: 'Africa',
+    coordinates: [-1.3, 24.5],
+    riskLevel: 'Moderate',
+    category: 'Fraud and infrastructure exposure',
+    sourceBasis: 'Regional monitoring',
+    sectors: ['Financial Services', 'SME / Mid-market', 'Government'],
+    analystNote: 'Digital growth and uneven security maturity create exposure to fraud, credential theft, service disruption, and third-party IT dependency.',
+    recommendedAction: 'Focus on email security, MFA, backup discipline, vendor controls, and practical incident response readiness.'
+  },
+  {
+    region: 'Asia-Pacific',
+    coordinates: [1.3, 103.8],
+    riskLevel: 'Elevated',
+    category: 'Supply-chain and cloud dependency',
+    sourceBasis: 'OTX + advisory monitoring',
+    sectors: ['Technology / Service Providers', 'Manufacturing', 'Financial Services'],
+    analystNote: 'Dense technology ecosystems, cloud dependency, and supply-chain connectivity increase the relevance of vendor and platform risk.',
+    recommendedAction: 'Map critical third parties, review cloud access controls, and monitor advisory themes affecting widely used technologies.'
+  },
+  {
+    region: 'Latin America',
+    coordinates: [-15.8, -47.9],
+    riskLevel: 'Moderate',
+    category: 'Ransomware and fraud monitoring',
+    sourceBasis: 'Strategic cyber monitoring',
+    sectors: ['Financial Services', 'Government', 'SME / Mid-market'],
+    analystNote: 'Ransomware, payment fraud, and public-sector disruption remain relevant monitoring themes for the region.',
+    recommendedAction: 'Review resilience controls, user-awareness measures, endpoint visibility, and incident escalation paths.'
+  }
+];
+
+const mapLegendItems = [
+  { level: 'High', description: 'Potentially significant disruption, exposure, or strategic concern requiring priority review.' },
+  { level: 'Elevated', description: 'Meaningful cyber risk theme requiring active monitoring and control validation.' },
+  { level: 'Moderate', description: 'Relevant monitoring area where exposure depends strongly on sector, suppliers, and local controls.' }
+];
+
 const ncscGuidanceItems = [
   {
     title: 'Reports & Advisories',
@@ -396,6 +479,7 @@ function Header() {
 
       <nav className="landing-nav">
         <a href="#executive-briefing">Briefing</a>
+        <a href="#cyber-risk-map">Risk Map</a>
         <a href="#ncsc-live">NCSC Feed</a>
         <a href="#ncsc-guidance">NCSC Guidance</a>
         <a href="#cyber-insurance">Insurance</a>
@@ -409,14 +493,14 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v1.3 · Live NCSC RSS Feed</span>
+          <span>Tracker v1.4.5 · Cyber Risk Intelligence Map</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
         <p className="hero-statement">Turning cyber uncertainty into structured insight</p>
         <p className="hero-description">
           A public preview of the Cygnus cyber risk intelligence framework — now aligned with the visual language of
-          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, live NCSC advisory feed, cyber insurance and risk transfer guidance,
+          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, a real cyber risk intelligence map, live NCSC advisory feed, cyber insurance and risk transfer guidance,
           live OTX source links, AI systems risk patching, strategic watchlists, and executive readiness guidance.
         </p>
 
@@ -447,7 +531,7 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v1.3 adds a live NCSC RSS feed route for official reports and advisory updates, alongside the existing OTX source feed.</p>
+            <p>v1.4.5 adds a proper OpenStreetMap-based Cyber Risk Intelligence Map with curated regional indicators and source-backed notes.</p>
           </div>
         </div>
       </section>
@@ -456,6 +540,18 @@ function Header() {
 }
 
 
+
+function getMapRiskColor(level) {
+  if (level === 'High') return '#c5162e';
+  if (level === 'Elevated') return '#b88924';
+  return '#169b7c';
+}
+
+function getMapRiskRadius(level) {
+  if (level === 'High') return 15;
+  if (level === 'Elevated') return 12;
+  return 10;
+}
 
 function buildNcscAnalystNote(item) {
   const text = `${item.title || ''} ${item.summary || ''}`.toLowerCase();
@@ -494,6 +590,118 @@ function buildNcscAnalystNote(item) {
   };
 }
 
+
+function CyberRiskMapSection() {
+  return (
+    <section id="cyber-risk-map" className="content-section cyber-risk-map-section">
+      <div className="section-heading">
+        <div>
+          <div className="section-kicker"><MapPinned size={16} /> Cyber Risk Intelligence Map</div>
+          <h2>Curated regional cyber risk indicators</h2>
+          <p>
+            This map is a strategic situational-awareness layer, not a simulated attack map. Each marker represents a
+            curated cyber risk indicator with a clear theme, source basis, sector relevance, and Cygnus analyst note.
+          </p>
+        </div>
+      </div>
+
+      <div className="map-value-note">
+        <MapPinned size={20} />
+        <div>
+          <strong>Map purpose</strong>
+          <span>
+            The map helps users understand where cyber risk signals or advisory concerns may be strategically relevant,
+            and why they matter for resilience, insurance readiness, sector exposure, and executive monitoring.
+          </span>
+        </div>
+      </div>
+
+      <div className="cyber-map-layout">
+        <div className="cyber-map-card">
+          <MapContainer
+            center={[20, 10]}
+            zoom={2}
+            minZoom={2}
+            maxZoom={5}
+            scrollWheelZoom={false}
+            worldCopyJump={true}
+            className="cyber-map"
+          >
+            <TileLayer
+              attribution="&copy; OpenStreetMap contributors"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            {cyberMapMarkers.map((marker) => (
+              <CircleMarker
+                key={marker.region}
+                center={marker.coordinates}
+                radius={getMapRiskRadius(marker.riskLevel)}
+                pathOptions={{
+                  color: '#ffffff',
+                  weight: 2,
+                  fillColor: getMapRiskColor(marker.riskLevel),
+                  fillOpacity: 0.86
+                }}
+              >
+                <Popup>
+                  <div className="map-popup">
+                    <strong>{marker.region}</strong>
+                    <span className={`map-risk-pill ${getSeverityClass(marker.riskLevel)}`}>{marker.riskLevel}</span>
+                    <p><b>Theme:</b> {marker.category}</p>
+                    <p><b>Source basis:</b> {marker.sourceBasis}</p>
+                    <p><b>Cygnus note:</b> {marker.analystNote}</p>
+                    <p><b>Recommended action:</b> {marker.recommendedAction}</p>
+                  </div>
+                </Popup>
+              </CircleMarker>
+            ))}
+          </MapContainer>
+          <div className="map-caption">
+            <MousePointerClick size={16} />
+            <span>Click a marker to review the curated regional intelligence note.</span>
+          </div>
+        </div>
+
+        <aside className="map-side-panel">
+          <div className="section-kicker"><LocateFixed size={16} /> Map Method</div>
+          <h3>Curated, not exhaustive</h3>
+          <p>
+            The map does not claim to show all cyber attacks. It highlights selected regional intelligence themes that
+            help users prioritise monitoring, controls, sector exposure, and executive review.
+          </p>
+
+          <div className="map-legend">
+            {mapLegendItems.map((item) => (
+              <div className="map-legend-row" key={item.level}>
+                <span style={{ backgroundColor: getMapRiskColor(item.level) }} />
+                <div>
+                  <strong>{item.level}</strong>
+                  <p>{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </div>
+
+      <div className="map-marker-grid">
+        {cyberMapMarkers.map((marker) => (
+          <article className="map-marker-card" key={marker.region}>
+            <div className="map-marker-topline">
+              <strong>{marker.region}</strong>
+              <span className={`risk-pill ${getSeverityClass(marker.riskLevel)}`}>{marker.riskLevel}</span>
+            </div>
+            <p>{marker.analystNote}</p>
+            <div className="sector-tag-row">
+              {marker.sectors.map((sector) => <span key={sector}>{sector}</span>)}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function NcscLivePanel() {
   const [status, setStatus] = useState('loading');
@@ -1110,6 +1318,8 @@ function Dashboard() {
 
       <ExecutiveBriefing />
 
+      <CyberRiskMapSection />
+
       <NcscLivePanel />
 
       <NcscGuidanceSection />
@@ -1376,7 +1586,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v1.3.1 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v1.4.5.1 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }

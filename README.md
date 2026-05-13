@@ -1,8 +1,14 @@
-# Cygnus Cyber Risk Intelligence Tracker v1.3
+# Cygnus Cyber Risk Intelligence Tracker v1.4.5
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v1.3 updates
+## v1.4.5 updates
+
+- Added proper OpenStreetMap-based Cyber Risk Intelligence Map using Leaflet
+- Fixed earlier Map icon naming conflict by avoiding unsafe Map icon usage
+- Added curated regional cyber risk indicators with popups
+- Added map method panel and risk legend
+- Preserved Live NCSC RSS Feed, NCSC guidance, Cyber Insurance & Risk Transfer, Executive Cyber Briefing, live OTX feed, analyst notes, sector relevance, AI patching, and Global Tracker-style branding
 
 - Added live NCSC RSS feed route at /api/ncsc-feed
 - Added Live NCSC RSS Feed section
