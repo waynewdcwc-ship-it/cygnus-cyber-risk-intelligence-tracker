@@ -1,6 +1,13 @@
-# Cygnus Cyber Risk Intelligence Tracker v1.4.5
+# Cygnus Cyber Risk Intelligence Tracker v1.4.6
 
 Fresh clean Vite/Vercel-ready static preview for the Cygnus Cyber Risk Intelligence Tracker.
+
+## v1.4.6 updates
+
+- Removed generated package-lock.json to avoid Vercel registry timeout issues
+- Added .npmrc pointing to the public npm registry
+- Pinned leaflet and react-leaflet dependencies instead of using latest
+- Preserved the proper OpenStreetMap-based Cyber Risk Intelligence Map
 
 ## v1.4.5 updates
 

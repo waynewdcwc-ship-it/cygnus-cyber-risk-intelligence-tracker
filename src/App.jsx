@@ -493,7 +493,7 @@ function Header() {
       <section className="landing-hero">
         <div className="version-banner">
           <ShieldCheck size={20} />
-          <span>Tracker v1.4.5 · Cyber Risk Intelligence Map</span>
+          <span>Tracker v1.4.6 · Cyber Risk Intelligence Map</span>
         </div>
 
         <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
@@ -531,7 +531,7 @@ function Header() {
           <div>
             <span>Public Preview Snapshot</span>
             <strong>Structured cyber risk insight</strong>
-            <p>v1.4.5 adds a proper OpenStreetMap-based Cyber Risk Intelligence Map with curated regional indicators and source-backed notes.</p>
+            <p>v1.4.6 keeps the proper OpenStreetMap-based Cyber Risk Intelligence Map and fixes Vercel dependency installation by using public npm registry settings.</p>
           </div>
         </div>
       </section>
@@ -1586,7 +1586,7 @@ function Footer() {
         <strong>Cygnus Development</strong>
         <span>Risk Intelligence Technology</span>
       </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v1.4.5.1 · Static cyber intelligence preview · No live API data in this build</p>
+      <p>Cygnus Cyber Risk Intelligence Tracker v1.4.6.1 · Static cyber intelligence preview · No live API data in this build</p>
     </footer>
   );
 }
