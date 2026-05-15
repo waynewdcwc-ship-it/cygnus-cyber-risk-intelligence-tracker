@@ -1,1602 +1,235 @@
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import {
-  Activity,
-  BadgeCheck,
-  ShieldQuestion,
-  Megaphone,
-  ListChecks,
-  BookOpenCheck,
-  UserCheck,
-  SlidersHorizontal,
-  MessageSquareWarning,
-  KeyRound,
-  Bot,
-  Brain,
-  Bug,
-  CheckCircle2,
-  ChevronRight,
-  CircleHelp,
-  ClipboardCheck,
-  DatabaseZap,
-  Eye,
-  ExternalLink,
-  FileWarning,
-  Store,
-  Building2,
-  HeartPulse,
-  Factory,
-  Printer,
-  FileText,
-  Flame,
-  Globe2,
-  Info,
-  Landmark,
-  Layers3,
-  LockKeyhole,
-  Network,
-  MousePointerClick,
-  LocateFixed,
-  MapPinned,
-  BellRing,
-  BookMarked,
-  RadioTower,
-  Newspaper,
-  BriefcaseBusiness,
-  NotebookPen,
-  Radar,
-  RefreshCcw,
-  Rss,
-  ScanSearch,
-  ShieldAlert,
-  ShieldCheck,
-  CircleDollarSign,
-  Scale,
-  CloudCog,
-  Handshake,
-  FileCheck2,
-  Banknote,
-  ShieldPlus,
-  Siren,
-  Target,
-  TrendingUp,
-  Zap
+  Activity, Banknote, BellRing, BookMarked, BookOpenCheck, Bot, BriefcaseBusiness,
+  Building2, CheckCircle2, CircleDollarSign, CircleHelp, ClipboardCheck, CloudCog,
+  DatabaseZap, ExternalLink, Factory, FileCheck2, Flame, Globe2, Handshake,
+  HeartPulse, KeyRound, Landmark, Layers3, LocateFixed, MapPinned, Megaphone,
+  MessageSquareWarning, MousePointerClick, Newspaper, NotebookPen, RadioTower,
+  Radar, Rss, Scale, ShieldAlert, ShieldCheck, ShieldPlus, ShieldQuestion, Siren,
+  SlidersHorizontal, Store, UserCheck
 } from 'lucide-react';
 
-const threatItems = [
-  {
-    id: 'ransomware',
-    title: 'Ransomware & Extortion',
-    severity: 'High',
-    trend: 'Increasing',
-    confidence: 'Medium',
-    summary:
-      'Continued targeting of public sector, healthcare, logistics, finance, and mid-market enterprises through double-extortion playbooks.',
-    signals: ['Credential compromise', 'Edge device exposure', 'Backup deletion attempts'],
-    action: 'Validate restore capability and isolate critical backup repositories.'
-  },
-  {
-    id: 'supply-chain',
-    title: 'Software Supply Chain Risk',
-    severity: 'Elevated',
-    trend: 'Stable',
-    confidence: 'Medium',
-    summary:
-      'Threat actors continue to exploit trusted software, update channels, third-party services, and dependency ecosystems.',
-    signals: ['Suspicious package updates', 'Vendor breach alerts', 'Unexpected outbound traffic'],
-    action: 'Maintain vendor inventory and monitor privileged integrations.'
-  },
-  {
-    id: 'phishing',
-    title: 'Phishing & Business Email Compromise',
-    severity: 'High',
-    trend: 'Increasing',
-    confidence: 'High',
-    summary:
-      'Credential theft remains a dominant entry vector, increasingly supported by AI-assisted social engineering and MFA fatigue attempts.',
-    signals: ['New inbox rules', 'Impossible travel alerts', 'Invoice redirection requests'],
-    action: 'Enforce phishing-resistant MFA for high-risk accounts.'
-  },
-  {
-    id: 'cloud',
-    title: 'Cloud Misconfiguration',
-    severity: 'Moderate',
-    trend: 'Stable',
-    confidence: 'Medium',
-    summary:
-      'Exposed storage, over-permissive identities, weak logging, and unmanaged secrets remain common sources of avoidable cyber exposure.',
-    signals: ['Public buckets', 'Excessive IAM permissions', 'Disabled audit logging'],
-    action: 'Prioritise identity hardening and continuous configuration checks.'
-  }
+const navItems = [
+  ['overview', 'Overview', Activity], ['cyber-risk-map', 'Risk Map', MapPinned],
+  ['otx-live', 'OTX Live Feed', Radar], ['ncsc-live', 'NCSC Feed', Rss],
+  ['executive-briefing', 'Executive Briefing', BookOpenCheck], ['ncsc-guidance', 'NCSC Guidance', BookMarked],
+  ['cyber-insurance', 'Insurance', ShieldPlus], ['ai-patching', 'AI Patching', Bot],
+  ['watchlist', 'Watchlist', ClipboardCheck], ['sector-relevance', 'Sector Relevance', Layers3],
+  ['threat-landscape', 'Threat Landscape', Siren], ['readiness-help', 'Readiness & Help', CircleHelp]
+];
+
+const markers = [
+  { region:'United Kingdom', coords:[54.5,-2.5], risk:'Elevated', theme:'Advisory concentration', source:'NCSC Reports & Advisories', sectors:['Government','Financial Services','SME / Mid-market'], note:'Monitor official guidance affecting internet-facing systems, identity controls, cloud services, and supplier dependencies.', action:'Validate exposure, patch priorities, and readiness controls for UK-linked operations or suppliers.' },
+  { region:'Europe', coords:[50.8,10.4], risk:'Elevated', theme:'Ransomware / supply-chain exposure', source:'OTX + NCSC monitoring', sectors:['Healthcare','Government','Technology Providers'], note:'European organisations remain exposed to ransomware, supplier compromise, and regulatory pressure around data protection and resilience.', action:'Review backup recovery, vendor dependencies, endpoint visibility, and incident communication planning.' },
+  { region:'North America', coords:[39.5,-98.35], risk:'Elevated', theme:'Credential theft / cloud exposure', source:'OTX pulse monitoring', sectors:['Financial Services','Technology Providers','SME / Mid-market'], note:'Cloud identity compromise, phishing, and business email compromise remain key pathways to financial and operational loss.', action:'Prioritise MFA, suspicious sign-in monitoring, privileged cloud accounts, and payment-change controls.' },
+  { region:'Middle East', coords:[29.3,47.7], risk:'High', theme:'Geopolitical cyber watch', source:'Strategic cyber monitoring', sectors:['Energy & Utilities','Government','Financial Services'], note:'Geopolitical tensions can increase cyber targeting of government, energy, financial, and critical infrastructure entities.', action:'Strengthen monitoring for edge-device exposure, phishing themes, destructive malware signals, and supplier disruption.' },
+  { region:'Africa', coords:[-1.3,24.5], risk:'Moderate', theme:'Fraud and infrastructure exposure', source:'Regional monitoring', sectors:['Financial Services','SME / Mid-market','Government'], note:'Digital growth and uneven security maturity create exposure to fraud, credential theft, service disruption, and third-party IT dependency.', action:'Focus on email security, MFA, backup discipline, vendor controls, and practical incident response readiness.' },
+  { region:'Asia-Pacific', coords:[1.3,103.8], risk:'Elevated', theme:'Supply-chain and cloud dependency', source:'OTX + advisory monitoring', sectors:['Technology Providers','Manufacturing','Financial Services'], note:'Dense technology ecosystems, cloud dependency, and supply-chain connectivity increase vendor and platform risk.', action:'Map critical third parties, review cloud access controls, and monitor advisory themes affecting widely used technologies.' },
+  { region:'Latin America', coords:[-15.8,-47.9], risk:'Moderate', theme:'Ransomware and fraud monitoring', source:'Strategic cyber monitoring', sectors:['Financial Services','Government','SME / Mid-market'], note:'Ransomware, payment fraud, and public-sector disruption remain relevant monitoring themes for the region.', action:'Review resilience controls, awareness measures, endpoint visibility, and incident escalation paths.' }
+];
+
+const threats = [
+  ['Ransomware & Extortion','High','Increasing','Credential compromise, backup deletion, disruption risk'],
+  ['Phishing & BEC','High','Increasing','Email compromise, invoice redirection, credential theft'],
+  ['Supply Chain Risk','Elevated','Stable','Vendor exposure, update channels, third-party access'],
+  ['Cloud Misconfiguration','Moderate','Stable','Identity controls, public storage, logging gaps']
 ];
 
 const watchlist = [
-  {
-    title: 'Identity compromise',
-    priority: 'Immediate',
-    detail: 'Monitor privileged access, MFA fatigue attempts, suspicious sign-ins, impossible travel, and abnormal session persistence.'
-  },
-  {
-    title: 'Internet-facing systems',
-    priority: 'High',
-    detail: 'Track exposed VPNs, firewalls, remote access tools, outdated web applications, and unmanaged externally visible assets.'
-  },
-  {
-    title: 'Third-party dependency',
-    priority: 'High',
-    detail: 'Review critical vendors, software update channels, outsourced IT providers, cloud integrations, and privileged service accounts.'
-  },
-  {
-    title: 'Data exposure',
-    priority: 'Elevated',
-    detail: 'Prioritise sensitive data locations, public cloud storage checks, email forwarding rules, and unusual outbound traffic patterns.'
-  }
+  ['Identity compromise','Immediate','Monitor privileged access, MFA fatigue, suspicious sign-ins, and abnormal session persistence.'],
+  ['Internet-facing systems','High','Track exposed VPNs, firewalls, remote access tools, web apps, and unmanaged external assets.'],
+  ['Third-party dependency','High','Review critical vendors, cloud integrations, outsourced IT providers, and privileged service accounts.'],
+  ['Data exposure','Elevated','Prioritise sensitive data locations, public cloud storage, email forwarding rules, and unusual outbound traffic.']
 ];
 
-const readinessItems = [
-  { label: 'Backups tested', status: 'Validate', description: 'Confirm restore tests, offline copies, and separation from production credentials.' },
-  { label: 'MFA coverage', status: 'Strengthen', description: 'Prioritise administrator, finance, email, VPN, and cloud console access.' },
-  { label: 'Logging visibility', status: 'Improve', description: 'Ensure sign-in, endpoint, cloud, firewall, and email logs are retained and reviewable.' },
-  { label: 'Incident roles', status: 'Define', description: 'Clarify decision-makers, technical responders, communications owners, and escalation paths.' }
+const aiItems = [
+  ['Prompt Injection Exposure','High','Prompt / Guardrail','Harden system prompts, validate inputs, and limit tool access.', MessageSquareWarning],
+  ['Sensitive Data Leakage','High','Data / Access Control','Review AI data access, redaction rules, retrieval scope, and output monitoring.', KeyRound],
+  ['Model Over-Trust','Elevated','Human Oversight','Add review for high-impact AI outputs and restrict autonomous decisions.', UserCheck],
+  ['AI Supply Chain Risk','Elevated','Vendor / Integration','Review vendors, APIs, plugins, model dependencies, and contractual safeguards.', Bot],
+  ['Output Drift','Moderate','Evaluation / Testing','Retest key workflows and maintain evaluation cases after model/config changes.', SlidersHorizontal]
 ];
 
-const aiPatchingItems = [
-  {
-    title: 'Prompt Injection Exposure',
-    severity: 'High',
-    patchType: 'Prompt / Guardrail',
-    icon: <MessageSquareWarning size={20} />,
-    summary: 'Attackers may attempt to override instructions, manipulate tools, or extract sensitive information through crafted prompts.',
-    actions: ['Harden system prompts', 'Validate user inputs', 'Limit tool access', 'Test common injection patterns']
-  },
-  {
-    title: 'Sensitive Data Leakage',
-    severity: 'High',
-    patchType: 'Data / Access Control',
-    icon: <KeyRound size={20} />,
-    summary: 'AI systems can expose confidential data if retrieval, tool permissions, logging, or redaction rules are not controlled.',
-    actions: ['Review data access', 'Strengthen redaction', 'Limit retrieval scope', 'Monitor unusual outputs']
-  },
-  {
-    title: 'Model Over-Trust',
-    severity: 'Elevated',
-    patchType: 'Human Oversight',
-    icon: <UserCheck size={20} />,
-    summary: 'Users may over-rely on AI outputs for high-impact operational, legal, financial, cyber, or strategic decisions.',
-    actions: ['Add human review', 'Label confidence clearly', 'Restrict autonomous decisions', 'Escalate high-impact outputs']
-  },
-  {
-    title: 'AI Supply Chain Risk',
-    severity: 'Elevated',
-    patchType: 'Vendor / Integration',
-    icon: <Bot size={20} />,
-    summary: 'AI vendors, APIs, plugins, models, browser extensions, and third-party integrations can introduce hidden exposure.',
-    actions: ['Review AI vendors', 'Track integrations', 'Limit plugin permissions', 'Check contractual safeguards']
-  },
-  {
-    title: 'Output Drift or Inconsistency',
-    severity: 'Moderate',
-    patchType: 'Evaluation / Testing',
-    icon: <SlidersHorizontal size={20} />,
-    summary: 'AI behaviour can change across model updates, prompt changes, data shifts, or configuration changes.',
-    actions: ['Retest key workflows', 'Maintain evaluation cases', 'Track model changes', 'Review failure patterns']
-  }
+const insurance = [
+  ['Incident response and recovery', 'Forensics, legal support, crisis communications, notification costs, and recovery support.', ShieldPlus],
+  ['Ransomware and extortion', 'Extortion response, negotiation support, restoration costs, downtime losses, and policy sublimits.', Banknote],
+  ['Business interruption', 'Losses linked to internal disruption, cloud platforms, service providers, logistics, or payment flows.', CloudCog],
+  ['Cyber crime and social engineering', 'Business email compromise, invoice redirection, fraudulent payment instructions, and credential-enabled loss.', CircleDollarSign]
 ];
 
-const aiPatchCycle = [
-  { step: 'Identify', detail: 'Find exposed AI workflows, data paths, tools, users, and high-impact decision points.' },
-  { step: 'Contain', detail: 'Restrict risky access, disable unsafe tools, and reduce data exposure while fixes are prepared.' },
-  { step: 'Patch', detail: 'Update prompts, policies, permissions, validation rules, logging, and human review controls.' },
-  { step: 'Verify', detail: 'Retest outputs, review logs, check edge cases, and confirm that the risk has been reduced.' }
+const ncscGuidance = [
+  ['Reports & Advisories','Official updates on vulnerabilities, exploitation campaigns, threat activity, and mitigation themes.', Newspaper],
+  ['Threat Reports','Higher-level view of cyber activity, attack patterns, and strategic cyber risk trends.', RadioTower],
+  ['Early Warning Concept','Network abuse, incident signals, exposed services, vulnerabilities, and external cyber exposure.', BellRing],
+  ['Mitigation Guidance','Controls for logging, monitoring, patching, access control, incident response, cloud security, and configuration.', BookMarked]
 ];
 
 const sectorRisk = [
-  { sector: 'Financial Services', level: 'High', driver: 'Fraud, ransomware, credential compromise, and third-party exposure' },
-  { sector: 'Healthcare', level: 'High', driver: 'Ransomware disruption, sensitive data exposure, and legacy system dependency' },
-  { sector: 'Government', level: 'High', driver: 'Espionage, disruptive attacks, critical service dependency, and public trust impact' },
-  { sector: 'Energy & Utilities', level: 'Elevated', driver: 'Operational technology exposure and geopolitically driven targeting' },
-  { sector: 'SME / Mid-market', level: 'Elevated', driver: 'Lower detection maturity and reliance on outsourced IT providers' }
+  ['Financial Services','High','Fraud, ransomware, credential compromise, and third-party exposure'],
+  ['Healthcare','High','Ransomware disruption, sensitive data exposure, and operational dependency'],
+  ['Government','High','Espionage, service disruption, identity exposure, and public trust impact'],
+  ['Energy & Utilities','Elevated','Operational technology exposure and geopolitically driven targeting'],
+  ['SME / Mid-market','Elevated','Lower detection maturity and reliance on outsourced IT providers']
 ];
 
-const intelligenceSources = [
-  {
-    name: 'AlienVault OTX',
-    status: 'Later phase',
-    note: 'Pulse and indicator integration reserved until the design baseline is stable.'
-  },
-  {
-    name: 'Public cyber advisories',
-    status: 'Future phase',
-    note: 'Can later include CISA, NCSC, CERT bulletins, and selected vendor advisories.'
-  },
-  {
-    name: 'Cygnus analyst overlay',
-    status: 'Manual input',
-    note: 'Future versions can support commentary, client sector notes, and regional context.'
-  }
+const readiness = [
+  ['Backups tested','Validate','Confirm restore tests, offline copies, and separation from production credentials.'],
+  ['MFA coverage','Strengthen','Prioritise administrator, finance, email, VPN, and cloud access.'],
+  ['Logging visibility','Improve','Ensure sign-in, endpoint, cloud, firewall, and email logs are retained.'],
+  ['Incident roles','Define','Clarify decision-makers, responders, communications owners, and escalation paths.']
 ];
 
-const methodology = [
-  {
-    title: 'Severity',
-    body: 'Assesses likely operational, financial, reputational, and regulatory impact if the threat materialises.'
-  },
-  {
-    title: 'Trend Direction',
-    body: 'Indicates whether observable threat activity appears to be increasing, stable, or decreasing.'
-  },
-  {
-    title: 'Assessment Confidence',
-    body: 'Reflects the quality, consistency, and timeliness of available source information.'
-  },
-  {
-    title: 'Strategic Relevance',
-    body: 'Connects technical cyber indicators to business risk, resilience priorities, and executive decision-making.'
-  }
-];
+function riskClass(risk){ return risk === 'High' ? 'risk-high' : risk === 'Elevated' ? 'risk-elevated' : 'risk-moderate'; }
+function riskColor(risk){ return risk === 'High' ? '#c5162e' : risk === 'Elevated' ? '#b88924' : '#169b7c'; }
+function riskRadius(risk){ return risk === 'High' ? 15 : risk === 'Elevated' ? 12 : 10; }
 
-const terminology = [
-  {
-    term: 'Threat theme',
-    meaning: 'A recurring cyber risk pattern such as ransomware, phishing, supply-chain compromise, or cloud exposure.'
-  },
-  {
-    term: 'Indicator',
-    meaning: 'A technical clue that may suggest suspicious or malicious activity, such as a domain, IP address, hash, or file name.'
-  },
-  {
-    term: 'Pulse',
-    meaning: 'A grouped intelligence item, often containing related indicators, adversary context, malware references, or campaign notes.'
-  },
-  {
-    term: 'Confidence',
-    meaning: 'A judgement about how reliable and complete the available information appears to be.'
-  }
-];
-
-const brandingPrinciples = [
-  {
-    icon: <Landmark size={18} />,
-    title: 'Cygnus identity',
-    body: 'Aligned to the Cygnus Development – Risk Intelligence Technology visual language.'
-  },
-  {
-    icon: <ScanSearch size={18} />,
-    title: 'Executive readability',
-    body: 'Structured for fast scanning and decision support rather than a cluttered feed-wall experience.'
-  },
-  {
-    icon: <ShieldCheck size={18} />,
-    title: 'Cyber-specific focus',
-    body: 'Dedicated cyber risk framing while preserving the wider Cygnus strategic risk design principles.'
-  }
-];
-
-
-const cyberMapMarkers = [
-  {
-    region: 'United Kingdom',
-    coordinates: [54.5, -2.5],
-    riskLevel: 'Elevated',
-    category: 'Advisory concentration',
-    sourceBasis: 'NCSC Reports & Advisories',
-    sectors: ['Government', 'Financial Services', 'SME / Mid-market'],
-    analystNote: 'Monitor official guidance affecting internet-facing systems, identity controls, cloud services, and supplier dependencies.',
-    recommendedAction: 'Use NCSC items to validate exposure, patch priorities, and readiness controls for UK-linked operations or suppliers.'
-  },
-  {
-    region: 'Europe',
-    coordinates: [50.8, 10.4],
-    riskLevel: 'Elevated',
-    category: 'Ransomware / supply-chain exposure',
-    sourceBasis: 'OTX + NCSC monitoring',
-    sectors: ['Healthcare', 'Government', 'Technology / Service Providers'],
-    analystNote: 'European organisations remain exposed to ransomware, supplier compromise, and regulatory pressure around data protection and resilience.',
-    recommendedAction: 'Review backup recovery, vendor dependencies, endpoint visibility, and incident communication planning.'
-  },
-  {
-    region: 'North America',
-    coordinates: [39.5, -98.35],
-    riskLevel: 'Elevated',
-    category: 'Credential theft / cloud exposure',
-    sourceBasis: 'OTX pulse monitoring',
-    sectors: ['Financial Services', 'Technology / Service Providers', 'SME / Mid-market'],
-    analystNote: 'Cloud identity compromise, phishing, and business email compromise remain key pathways to financial and operational loss.',
-    recommendedAction: 'Prioritise MFA coverage, suspicious sign-in monitoring, privileged cloud accounts, and payment-change controls.'
-  },
-  {
-    region: 'Middle East',
-    coordinates: [29.3, 47.7],
-    riskLevel: 'High',
-    category: 'Geopolitical cyber watch',
-    sourceBasis: 'Strategic cyber monitoring',
-    sectors: ['Energy & Utilities', 'Government', 'Financial Services'],
-    analystNote: 'Geopolitical tensions can increase cyber targeting of government, energy, financial, and critical infrastructure entities.',
-    recommendedAction: 'Strengthen monitoring for edge-device exposure, phishing themes, destructive malware signals, and supplier disruption.'
-  },
-  {
-    region: 'Africa',
-    coordinates: [-1.3, 24.5],
-    riskLevel: 'Moderate',
-    category: 'Fraud and infrastructure exposure',
-    sourceBasis: 'Regional monitoring',
-    sectors: ['Financial Services', 'SME / Mid-market', 'Government'],
-    analystNote: 'Digital growth and uneven security maturity create exposure to fraud, credential theft, service disruption, and third-party IT dependency.',
-    recommendedAction: 'Focus on email security, MFA, backup discipline, vendor controls, and practical incident response readiness.'
-  },
-  {
-    region: 'Asia-Pacific',
-    coordinates: [1.3, 103.8],
-    riskLevel: 'Elevated',
-    category: 'Supply-chain and cloud dependency',
-    sourceBasis: 'OTX + advisory monitoring',
-    sectors: ['Technology / Service Providers', 'Manufacturing', 'Financial Services'],
-    analystNote: 'Dense technology ecosystems, cloud dependency, and supply-chain connectivity increase the relevance of vendor and platform risk.',
-    recommendedAction: 'Map critical third parties, review cloud access controls, and monitor advisory themes affecting widely used technologies.'
-  },
-  {
-    region: 'Latin America',
-    coordinates: [-15.8, -47.9],
-    riskLevel: 'Moderate',
-    category: 'Ransomware and fraud monitoring',
-    sourceBasis: 'Strategic cyber monitoring',
-    sectors: ['Financial Services', 'Government', 'SME / Mid-market'],
-    analystNote: 'Ransomware, payment fraud, and public-sector disruption remain relevant monitoring themes for the region.',
-    recommendedAction: 'Review resilience controls, user-awareness measures, endpoint visibility, and incident escalation paths.'
-  }
-];
-
-const mapLegendItems = [
-  { level: 'High', description: 'Potentially significant disruption, exposure, or strategic concern requiring priority review.' },
-  { level: 'Elevated', description: 'Meaningful cyber risk theme requiring active monitoring and control validation.' },
-  { level: 'Moderate', description: 'Relevant monitoring area where exposure depends strongly on sector, suppliers, and local controls.' }
-];
-
-const ncscGuidanceItems = [
-  {
-    title: 'Reports & Advisories',
-    icon: <Newspaper size={22} />,
-    summary: 'Official advisory-style updates can help organisations understand exploitation campaigns, vulnerability alerts, threat actor activity, and priority mitigation themes.',
-    riskLens: 'Use advisories to validate whether the organisation, its suppliers, or its critical technologies may be affected.'
-  },
-  {
-    title: 'Threat Reports',
-    icon: <RadioTower size={22} />,
-    summary: 'Threat reports provide a higher-level picture of emerging cyber activity, attack patterns, and strategic cyber risk trends.',
-    riskLens: 'Use threat reports to brief executives, adjust monitoring priorities, and support cyber risk horizon scanning.'
-  },
-  {
-    title: 'Early Warning Concept',
-    icon: <BellRing size={22} />,
-    summary: 'Early warning capability focuses on alerting organisations to network abuse, potential incidents, exposed services, vulnerabilities, or other signs of external cyber exposure.',
-    riskLens: 'Use this concept to strengthen attack-surface awareness, external exposure monitoring, and incident escalation readiness.'
-  },
-  {
-    title: 'Mitigation Guidance',
-    icon: <BookMarked size={22} />,
-    summary: 'Practical guidance supports controls such as logging, monitoring, patching, access control, incident response, cloud security, and secure configuration.',
-    riskLens: 'Use mitigation guidance to strengthen readiness, support insurance control evidence, and prioritise remediation actions.'
-  }
-];
-
-const ncscActionChecklist = [
-  'Monitor official advisories for affected technologies, known exploited vulnerabilities, and recommended mitigations.',
-  'Compare advisory themes with live OTX pulses, sector relevance tags, and known organisational exposure.',
-  'Review whether affected systems are internet-facing, business-critical, supplier-managed, or linked to privileged access.',
-  'Use guidance themes to strengthen cyber insurance readiness evidence, including MFA, backups, logging, and patching.',
-  'Escalate high-impact advisories into executive cyber briefing, incident response planning, and board-level risk reporting.'
-];
-
-const ncscFutureIntegrations = [
-  'Live NCSC RSS feed for reports and advisories',
-  'Cygnus analyst notes for advisory items',
-  'Sector relevance tagging for official advisories',
-  'Readiness and insurance impact mapping',
-  'Links to full official NCSC guidance pages'
-];
-
-const insuranceCoverageItems = [
-  {
-    title: 'Incident response and recovery',
-    icon: <ShieldPlus size={22} />,
-    summary: 'Cyber policies may support forensic investigation, legal advice, breach response, crisis communications, notification costs, and specialist recovery support.',
-    focus: ['Digital forensics', 'Legal support', 'Crisis communications', 'Data restoration']
-  },
-  {
-    title: 'Ransomware and extortion',
-    icon: <Banknote size={22} />,
-    summary: 'Policies may address extortion response, negotiation support, recovery costs, and business interruption, subject to policy wording, legality, exclusions, and sublimits.',
-    focus: ['Extortion response', 'Restoration costs', 'Downtime losses', 'Policy sublimits']
-  },
-  {
-    title: 'Business interruption',
-    icon: <CloudCog size={22} />,
-    summary: 'Cover may apply where a cyber incident disrupts operations, customer portals, production systems, cloud services, logistics, payment flows, or other critical technology dependencies.',
-    focus: ['Lost income', 'Extra expense', 'Cloud dependency', 'Supplier disruption']
-  },
-  {
-    title: 'Cyber crime and social engineering',
-    icon: <CircleDollarSign size={22} />,
-    summary: 'Some policies or extensions may address invoice redirection, business email compromise, fraudulent payment instructions, and credential-enabled financial loss.',
-    focus: ['BEC fraud', 'Invoice redirection', 'Funds transfer loss', 'Approval controls']
-  }
-];
-
-const insuranceReadinessItems = [
-  'Multi-factor authentication for email, cloud, VPN, finance, and privileged accounts',
-  'Offline or isolated backups with tested restoration capability',
-  'Patch management for exposed systems, critical applications, and third-party platforms',
-  'Endpoint detection, logging, and incident response escalation procedures',
-  'Privileged access controls and joiner/mover/leaver access reviews',
-  'Vendor and cloud dependency mapping for critical service providers'
-];
-
-const brokerQuestions = [
-  'Does the policy cover ransomware, extortion support, restoration costs, and business interruption?',
-  'Are ransom payments covered only where lawful, and are there any specific sublimits?',
-  'Does the wording cover cloud outages, managed service provider incidents, or software supply-chain disruption?',
-  'Does the policy cover business email compromise, social engineering fraud, and invoice redirection?',
-  'Are AI-related cyber incidents excluded, sublimited, or subject to additional underwriting requirements?',
-  'Which incident response vendors must be used, and what notification timelines apply after discovery?'
-];
-
-const executivePriorities = [
-  {
-    title: 'Identity and access control',
-    detail: 'Prioritise MFA coverage, privileged account controls, suspicious sign-in monitoring, and business email compromise prevention.'
-  },
-  {
-    title: 'Resilience against disruption',
-    detail: 'Validate backups, incident escalation roles, restore procedures, endpoint visibility, and communication plans.'
-  },
-  {
-    title: 'AI-enabled system governance',
-    detail: 'Review AI access to sensitive data, harden prompts and guardrails, and define human review for high-impact outputs.'
-  }
-];
-
-const executiveActions = [
-  'Review live OTX pulses for overlap with known assets, vendors, cloud services, and exposed systems.',
-  'Use sector relevance tags to prioritise review for industries and operating environments most likely to be affected.',
-  'Treat AI patching as part of cyber resilience: prompt controls, access limits, logging, validation, and human oversight.'
-];
-
-function getSeverityClass(level) {
-  if (level === 'High') return 'risk-high';
-  if (level === 'Elevated') return 'risk-elevated';
-  return 'risk-moderate';
+function buildAnalystNote(item) {
+  const text = `${item.name || item.title || ''} ${item.description || item.summary || ''}`.toLowerCase();
+  if (text.includes('ransom') || text.includes('extortion')) return ['Business continuity risk','Review backup recoverability, privileged access, endpoint visibility, and incident escalation readiness.'];
+  if (text.includes('phish') || text.includes('credential') || text.includes('email')) return ['Identity and fraud exposure','Review MFA coverage, inbox rules, impossible-travel alerts, and payment-change approval controls.'];
+  if (text.includes('malware') || text.includes('trojan') || text.includes('loader')) return ['Endpoint and persistence risk','Check endpoint detections, unusual process activity, command-and-control indicators, and downloaded files.'];
+  if (text.includes('cve') || text.includes('vulnerab') || text.includes('exploit')) return ['Patch and exposure risk','Review exposed assets, patch status, and externally reachable systems with privileged access paths.'];
+  if (text.includes('cloud') || text.includes('aws') || text.includes('azure')) return ['Cloud control risk','Review privileged cloud identities, storage exposure, audit logging, service accounts, and unusual API activity.'];
+  return ['Strategic cyber monitoring','Compare the item against known assets, vendors, exposed systems, logs, and current incident priorities.'];
 }
 
-function Header() {
-  return (
-    <header className="hero-shell global-style-landing">
-      <div className="global-brand-header">
-        <div>
-          <div className="brand-title">CYGNUS DEVELOPMENT</div>
-          <div className="brand-tagline">RISK INTELLIGENCE TECHNOLOGY</div>
-        </div>
-      </div>
-
-      <nav className="landing-nav">
-        <a href="#executive-briefing">Briefing</a>
-        <a href="#cyber-risk-map">Risk Map</a>
-        <a href="#ncsc-live">NCSC Feed</a>
-        <a href="#ncsc-guidance">NCSC Guidance</a>
-        <a href="#cyber-insurance">Insurance</a>
-        <a href="#watchlist">Watchlist</a>
-        <a href="#otx-live">OTX Feed</a>
-        <a href="#ai-patching">AI Patching</a>
-        <a href="#threat-landscape">Threats</a>
-        <a href="#help">Help</a>
-      </nav>
-
-      <section className="landing-hero">
-        <div className="version-banner">
-          <ShieldCheck size={20} />
-          <span>Tracker v1.4.6 · Cyber Risk Intelligence Map</span>
-        </div>
-
-        <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
-        <p className="hero-statement">Turning cyber uncertainty into structured insight</p>
-        <p className="hero-description">
-          A public preview of the Cygnus cyber risk intelligence framework — now aligned with the visual language of
-          the Global Strategic Risk Intelligence Tracker and enhanced with an executive briefing layer, a real cyber risk intelligence map, live NCSC advisory feed, cyber insurance and risk transfer guidance,
-          live OTX source links, AI systems risk patching, strategic watchlists, and executive readiness guidance.
-        </p>
-
-        <div className="landing-feature-stack">
-          <article>
-            <strong>Monitor cyber signals</strong>
-            <span>Track live OTX pulses, priority cyber themes, and emerging risk indicators.</span>
-          </article>
-          <article>
-            <strong>Review AI exposure</strong>
-            <span>Assess AI system risks such as prompt injection, data leakage, model over-trust, and output drift.</span>
-          </article>
-          <article>
-            <strong>Support decisions</strong>
-            <span>Translate technical cyber signals into structured business-risk and resilience priorities.</span>
-          </article>
-        </div>
-
-        <div className="landing-actions">
-          <a href="#otx-live" className="landing-button primary"><Layers3 size={20} /> Explore OTX Feed</a>
-          <a href="#ai-patching" className="landing-button secondary"><FileText size={20} /> View AI Patching</a>
-          <a href="#help" className="landing-button secondary"><CircleHelp size={20} /> Help & Methodology</a>
-          <button className="landing-button secondary" type="button" onClick={() => window.print()}><Printer size={20} /> Print / Save Briefing</button>
-        </div>
-
-        <div className="snapshot-card">
-          <div className="snapshot-icon"><Radar size={28} /></div>
-          <div>
-            <span>Public Preview Snapshot</span>
-            <strong>Structured cyber risk insight</strong>
-            <p>v1.4.6 keeps the proper OpenStreetMap-based Cyber Risk Intelligence Map and fixes Vercel dependency installation by using public npm registry settings.</p>
-          </div>
-        </div>
-      </section>
-    </header>
-  );
-}
-
-
-
-function getMapRiskColor(level) {
-  if (level === 'High') return '#c5162e';
-  if (level === 'Elevated') return '#b88924';
-  return '#169b7c';
-}
-
-function getMapRiskRadius(level) {
-  if (level === 'High') return 15;
-  if (level === 'Elevated') return 12;
-  return 10;
-}
-
-function buildNcscAnalystNote(item) {
-  const text = `${item.title || ''} ${item.summary || ''}`.toLowerCase();
-
-  if (text.includes('vulnerab') || text.includes('cve') || text.includes('patch') || text.includes('exploit')) {
-    return {
-      relevance: 'Patch and exposure risk',
-      action: 'Check whether the affected technology exists in your environment or supply chain, then prioritise exposed and business-critical systems.'
-    };
-  }
-
-  if (text.includes('ransom') || text.includes('malware')) {
-    return {
-      relevance: 'Operational disruption risk',
-      action: 'Review backup recoverability, endpoint visibility, incident response roles, and critical process recovery plans.'
-    };
-  }
-
-  if (text.includes('phish') || text.includes('messaging') || text.includes('credential') || text.includes('account')) {
-    return {
-      relevance: 'Identity and user-targeting risk',
-      action: 'Review MFA coverage, suspicious sign-in monitoring, inbox rules, user awareness, and high-risk account protections.'
-    };
-  }
-
-  if (text.includes('router') || text.includes('vpn') || text.includes('firewall') || text.includes('edge')) {
-    return {
-      relevance: 'Internet-facing infrastructure risk',
-      action: 'Validate external exposure, firmware status, administrative access controls, and monitoring for edge-device compromise.'
-    };
-  }
-
-  return {
-    relevance: 'Official advisory monitoring',
-    action: 'Compare the advisory theme against critical assets, key vendors, exposed services, and current executive cyber priorities.'
-  };
-}
-
-
-function CyberRiskMapSection() {
-  return (
-    <section id="cyber-risk-map" className="content-section cyber-risk-map-section">
-      <div className="section-heading">
-        <div>
-          <div className="section-kicker"><MapPinned size={16} /> Cyber Risk Intelligence Map</div>
-          <h2>Curated regional cyber risk indicators</h2>
-          <p>
-            This map is a strategic situational-awareness layer, not a simulated attack map. Each marker represents a
-            curated cyber risk indicator with a clear theme, source basis, sector relevance, and Cygnus analyst note.
-          </p>
-        </div>
-      </div>
-
-      <div className="map-value-note">
-        <MapPinned size={20} />
-        <div>
-          <strong>Map purpose</strong>
-          <span>
-            The map helps users understand where cyber risk signals or advisory concerns may be strategically relevant,
-            and why they matter for resilience, insurance readiness, sector exposure, and executive monitoring.
-          </span>
-        </div>
-      </div>
-
-      <div className="cyber-map-layout">
-        <div className="cyber-map-card">
-          <MapContainer
-            center={[20, 10]}
-            zoom={2}
-            minZoom={2}
-            maxZoom={5}
-            scrollWheelZoom={false}
-            worldCopyJump={true}
-            className="cyber-map"
-          >
-            <TileLayer
-              attribution="&copy; OpenStreetMap contributors"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-
-            {cyberMapMarkers.map((marker) => (
-              <CircleMarker
-                key={marker.region}
-                center={marker.coordinates}
-                radius={getMapRiskRadius(marker.riskLevel)}
-                pathOptions={{
-                  color: '#ffffff',
-                  weight: 2,
-                  fillColor: getMapRiskColor(marker.riskLevel),
-                  fillOpacity: 0.86
-                }}
-              >
-                <Popup>
-                  <div className="map-popup">
-                    <strong>{marker.region}</strong>
-                    <span className={`map-risk-pill ${getSeverityClass(marker.riskLevel)}`}>{marker.riskLevel}</span>
-                    <p><b>Theme:</b> {marker.category}</p>
-                    <p><b>Source basis:</b> {marker.sourceBasis}</p>
-                    <p><b>Cygnus note:</b> {marker.analystNote}</p>
-                    <p><b>Recommended action:</b> {marker.recommendedAction}</p>
-                  </div>
-                </Popup>
-              </CircleMarker>
-            ))}
-          </MapContainer>
-          <div className="map-caption">
-            <MousePointerClick size={16} />
-            <span>Click a marker to review the curated regional intelligence note.</span>
-          </div>
-        </div>
-
-        <aside className="map-side-panel">
-          <div className="section-kicker"><LocateFixed size={16} /> Map Method</div>
-          <h3>Curated, not exhaustive</h3>
-          <p>
-            The map does not claim to show all cyber attacks. It highlights selected regional intelligence themes that
-            help users prioritise monitoring, controls, sector exposure, and executive review.
-          </p>
-
-          <div className="map-legend">
-            {mapLegendItems.map((item) => (
-              <div className="map-legend-row" key={item.level}>
-                <span style={{ backgroundColor: getMapRiskColor(item.level) }} />
-                <div>
-                  <strong>{item.level}</strong>
-                  <p>{item.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </aside>
-      </div>
-
-      <div className="map-marker-grid">
-        {cyberMapMarkers.map((marker) => (
-          <article className="map-marker-card" key={marker.region}>
-            <div className="map-marker-topline">
-              <strong>{marker.region}</strong>
-              <span className={`risk-pill ${getSeverityClass(marker.riskLevel)}`}>{marker.riskLevel}</span>
-            </div>
-            <p>{marker.analystNote}</p>
-            <div className="sector-tag-row">
-              {marker.sectors.map((sector) => <span key={sector}>{sector}</span>)}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function NcscLivePanel() {
-  const [status, setStatus] = useState('loading');
-  const [message, setMessage] = useState('Checking live NCSC RSS route...');
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadNcscFeed() {
-      try {
-        const response = await fetch('/api/ncsc-feed');
-        const data = await response.json();
-
-        if (ignore) return;
-
-        if (!response.ok || !data.ok) {
-          setStatus('fallback');
-          setMessage(data.message || 'NCSC RSS feed is not available in this environment yet.');
-          setItems([]);
-          return;
-        }
-
-        setStatus('live');
-        setMessage(data.message || 'NCSC RSS feed loaded through the serverless route.');
-        setItems(data.items || []);
-      } catch (error) {
-        if (ignore) return;
-        setStatus('fallback');
-        setMessage('NCSC RSS preview is unavailable. Static guidance remains active.');
-        setItems([]);
-      }
-    }
-
-    loadNcscFeed();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  return (
-    <section id="ncsc-live" className="content-section ncsc-live-section">
-      <div className="section-heading">
-        <div>
-          <div className="section-kicker"><Rss size={16} /> Live NCSC RSS Feed</div>
-          <h2>Official reports and advisory updates</h2>
-          <p>
-            This panel loads NCSC reports and advisory updates through a lightweight Vercel serverless route. It does
-            not require an API key and complements the existing OTX feed with an official guidance source.
-          </p>
-        </div>
-        <div className={`otx-status ${status}`}>{status === 'live' ? 'Live NCSC route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
-      </div>
-
-      <div className="ncsc-live-panel">
-        <div className="ncsc-live-summary">
-          <div className="status-row"><span className="pulse-dot" /> {message}</div>
-          <h3>NCSC RSS Foundation</h3>
-          <p>
-            The frontend requests <strong>/api/ncsc-feed</strong>. The serverless function fetches the public NCSC
-            reports/advisories RSS feed and returns simplified items for the tracker.
-          </p>
-        </div>
-
-        <div className="ncsc-feed-list">
-          {status === 'live' && items.length > 0 ? (
-            items.map((item) => {
-              const note = buildNcscAnalystNote(item);
-              return (
-                <article className="ncsc-feed-card" key={item.link || item.title}>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <span>{item.summary || 'No summary provided in the RSS preview payload.'}</span>
-                  </div>
-                  <div className="otx-meta">
-                    <em>{item.pubDate || 'Publish date unavailable'}</em>
-                    <em>{item.source || 'NCSC'}</em>
-                  </div>
-
-                  <div className="analyst-note-card">
-                    <div className="analyst-note-heading">
-                      <NotebookPen size={16} />
-                      <strong>Cygnus Analyst Note</strong>
-                      <em>{note.relevance}</em>
-                    </div>
-                    <p>{note.action}</p>
-                  </div>
-
-                  {item.link ? (
-                    <a
-                      className="otx-source-link"
-                      href={item.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`Open full NCSC item for ${item.title}`}
-                    >
-                      View full NCSC item <ExternalLink size={14} />
-                    </a>
-                  ) : (
-                    <span className="otx-source-link disabled">Source link unavailable</span>
-                  )}
-                </article>
-              );
-            })
-          ) : (
-            <article className="ncsc-feed-card static-fallback">
-              <strong>Static NCSC guidance active</strong>
-              <span>
-                The tracker remains fully usable while the live NCSC RSS route is unavailable. The static advisory
-                and guidance layer below remains active.
-              </span>
-              <div className="otx-meta"><em>No API key required</em><em>Safe fallback</em></div>
-            </article>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function NcscGuidanceSection() {
-  return (
-    <section id="ncsc-guidance" className="content-section ncsc-guidance-section">
-      <div className="section-heading">
-        <div>
-          <div className="section-kicker"><BookMarked size={16} /> NCSC Advisory & Guidance Layer</div>
-          <h2>Official guidance translated into cyber risk priorities</h2>
-          <p>
-            This static v1.2 layer introduces an NCSC-style advisory and guidance framework. It is designed to sit
-            alongside the live OTX feed by adding an official-guidance perspective on cyber risk, readiness, mitigation,
-            incident response, and executive decision-making.
-          </p>
-        </div>
-      </div>
-
-      <div className="ncsc-hero-card">
-        <div>
-          <span>Authoritative guidance lens</span>
-          <strong>Use official advisories to validate exposure and prioritise response.</strong>
-          <p>
-            OTX provides live threat intelligence signals. NCSC-style guidance adds a more formal advisory and mitigation
-            layer. Cygnus connects both into business impact, sector relevance, insurance readiness, and executive action.
-          </p>
-        </div>
-        <a
-          className="ncsc-source-button"
-          href="https://www.ncsc.gov.uk/section/keep-up-to-date/reports-advisories"
-          target="_blank"
-          rel="noreferrer"
-        >
-          View NCSC advisories <ExternalLink size={16} />
-        </a>
-      </div>
-
-      <div className="ncsc-grid">
-        {ncscGuidanceItems.map((item) => (
-          <article className="ncsc-card" key={item.title}>
-            <div className="ncsc-card-icon">{item.icon}</div>
-            <h3>{item.title}</h3>
-            <p>{item.summary}</p>
-            <div className="ncsc-risk-lens">
-              <strong>Cygnus risk lens:</strong>
-              <span>{item.riskLens}</span>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <div className="ncsc-split">
-        <article className="ncsc-panel">
-          <div className="section-kicker"><ShieldCheck size={16} /> Advisory Action Checklist</div>
-          <h3>How to use official guidance in the tracker</h3>
-          <div className="ncsc-action-list">
-            {ncscActionChecklist.map((item) => (
-              <div className="ncsc-action-row" key={item}>
-                <CheckCircle2 size={16} />
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="ncsc-panel future-ncsc-panel">
-          <div className="section-kicker"><DatabaseZap size={16} /> Future Live Feed Phase</div>
-          <h3>Now live in v1.3</h3>
-          <p>
-            v1.3 adds a lightweight serverless RSS route for NCSC reports and advisories. It does not require an API key and complements the existing OTX feed.
-          </p>
-          <div className="ncsc-future-list">
-            {ncscFutureIntegrations.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </div>
-        </article>
-      </div>
-    </section>
-  );
-}
-
-function CyberInsuranceSection() {
-  return (
-    <section id="cyber-insurance" className="content-section cyber-insurance-section">
-      <div className="section-heading">
-        <div>
-          <div className="section-kicker"><ShieldPlus size={16} /> Cyber Insurance & Risk Transfer</div>
-          <h2>Financial resilience against cyber incidents</h2>
-          <p>
-            Cyber insurance does not replace cybersecurity controls, but it can help organisations manage the financial
-            impact of cyber incidents, including response costs, business interruption, ransomware events, data breaches,
-            cyber crime, and third-party technology disruption.
-          </p>
-        </div>
-      </div>
-
-      <div className="insurance-hero-card">
-        <div>
-          <span>Risk transfer lens</span>
-          <strong>Insurance is part of resilience, not a substitute for controls.</strong>
-          <p>
-            The strongest cyber risk posture combines prevention, detection, response readiness, recovery capability,
-            and carefully reviewed insurance cover. Policy wording, exclusions, sublimits, and required security controls
-            should be checked before an incident occurs.
-          </p>
-        </div>
-        <div className="insurance-icon-stack">
-          <FileCheck2 />
-          <Handshake />
-          <Scale />
-        </div>
-      </div>
-
-      <div className="insurance-grid">
-        {insuranceCoverageItems.map((item) => (
-          <article className="insurance-card" key={item.title}>
-            <div className="insurance-card-icon">{item.icon}</div>
-            <h3>{item.title}</h3>
-            <p>{item.summary}</p>
-            <div className="insurance-focus-row">
-              {item.focus.map((focus) => <span key={focus}>{focus}</span>)}
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <div className="insurance-split">
-        <article className="insurance-panel">
-          <div className="section-kicker"><FileCheck2 size={16} /> Insurance Readiness Checklist</div>
-          <h3>Controls insurers commonly expect</h3>
-          <div className="insurance-checklist">
-            {insuranceReadinessItems.map((item) => (
-              <div className="insurance-check-row" key={item}>
-                <ShieldCheck size={16} />
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="insurance-panel broker-panel">
-          <div className="section-kicker"><Handshake size={16} /> Broker / Insurer Questions</div>
-          <h3>Questions to ask before relying on the policy</h3>
-          <div className="broker-question-list">
-            {brokerQuestions.map((question) => (
-              <div className="broker-question-row" key={question}>
-                <Scale size={16} />
-                <span>{question}</span>
-              </div>
-            ))}
-          </div>
-        </article>
-      </div>
-    </section>
-  );
-}
-
-function ExecutiveBriefing() {
-  return (
-    <section id="executive-briefing" className="content-section executive-briefing-section">
-      <div className="section-heading">
-        <div>
-          <div className="section-kicker"><BookOpenCheck size={16} /> Executive Cyber Briefing</div>
-          <h2>Current cyber risk intelligence summary</h2>
-          <p>
-            A concise executive layer that brings together the live OTX feed, analyst notes, sector relevance, AI systems risk,
-            and operational readiness into one decision-focused view.
-          </p>
-        </div>
-      </div>
-
-      <div className="briefing-grid">
-        <article className="briefing-hero-card">
-          <div className="briefing-topline">
-            <span>Current posture</span>
-            <strong>Elevated</strong>
-          </div>
-          <p>
-            The current cyber risk posture remains elevated due to persistent ransomware, credential compromise,
-            exposed systems, third-party dependency, and the growing governance challenge of AI-enabled systems.
-          </p>
-          <div className="briefing-meta-row">
-            <em>Live OTX feed active where configured</em>
-            <em>Analyst notes enabled</em>
-            <em>Sector relevance enabled</em>
-          </div>
-        </article>
-
-        <div className="briefing-priority-stack">
-          {executivePriorities.map((item) => (
-            <article className="briefing-priority-card" key={item.title}>
-              <ShieldQuestion size={20} />
-              <div>
-                <strong>{item.title}</strong>
-                <span>{item.detail}</span>
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-
-      <div className="briefing-actions-card">
-        <div>
-          <div className="section-kicker"><ListChecks size={16} /> Recommended Executive Actions</div>
-          <h3>Priority actions for the next review cycle</h3>
-        </div>
-        <div className="briefing-action-list">
-          {executiveActions.map((action) => (
-            <div className="briefing-action-row" key={action}>
-              <Megaphone size={17} />
-              <span>{action}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ThreatCard({ item }) {
-  return (
-    <article className="threat-card">
-      <div className="card-topline">
-        <div className="icon-bubble"><ShieldAlert size={20} /></div>
-        <span className={`risk-pill ${getSeverityClass(item.severity)}`}>{item.severity}</span>
-      </div>
-      <h3>{item.title}</h3>
-      <p>{item.summary}</p>
-      <div className="mini-meta">
-        <span><TrendingUp size={14} /> Trend: {item.trend}</span>
-        <span><Eye size={14} /> Confidence: {item.confidence}</span>
-      </div>
-      <div className="signal-list">
-        {item.signals.map((signal) => <span key={signal}>{signal}</span>)}
-      </div>
-      <div className="recommended-action">
-        <strong>Recommended focus:</strong> {item.action}
-      </div>
-    </article>
-  );
-}
-
-
-
-function buildAnalystNote(pulse) {
-  const text = `${pulse.name || ''} ${pulse.description || ''}`.toLowerCase();
-
-  if (text.includes('ransom') || text.includes('extortion')) {
-    return {
-      relevance: 'Business continuity risk',
-      note: 'This pulse may indicate activity linked to ransomware or extortion. Organisations should review backup recoverability, privileged access, endpoint visibility, and incident escalation readiness.',
-      action: 'Prioritise restore testing, account hardening, and detection of lateral movement or backup deletion attempts.'
-    };
-  }
-
-  if (text.includes('phish') || text.includes('credential') || text.includes('email')) {
-    return {
-      relevance: 'Identity and fraud exposure',
-      note: 'This pulse may relate to credential theft, phishing, or business email compromise. The most relevant business risk is unauthorised access to email, finance workflows, cloud accounts, or privileged systems.',
-      action: 'Review MFA coverage, suspicious inbox rules, impossible-travel alerts, and payment-change approval controls.'
-    };
-  }
-
-  if (text.includes('malware') || text.includes('trojan') || text.includes('loader') || text.includes('backdoor')) {
-    return {
-      relevance: 'Endpoint and persistence risk',
-      note: 'This pulse may indicate malware delivery, persistence, or post-compromise tooling. The business concern is loss of endpoint integrity, data exposure, and possible staging for wider compromise.',
-      action: 'Check endpoint detections, unusual process activity, command-and-control indicators, and recently downloaded files.'
-    };
-  }
-
-  if (text.includes('cve') || text.includes('vulnerab') || text.includes('exploit')) {
-    return {
-      relevance: 'Patch and exposure risk',
-      note: 'This pulse may relate to vulnerability exploitation or exposed systems. The strategic concern is whether internet-facing assets, third-party platforms, or critical applications are vulnerable.',
-      action: 'Review exposed assets, confirm patch status, and prioritise externally reachable systems with privileged access paths.'
-    };
-  }
-
-  if (text.includes('cloud') || text.includes('aws') || text.includes('azure') || text.includes('google cloud')) {
-    return {
-      relevance: 'Cloud control risk',
-      note: 'This pulse may relate to cloud exposure, identity misuse, or misconfiguration. The key risk is unauthorised access to cloud resources, data stores, or administrative consoles.',
-      action: 'Review privileged cloud identities, storage exposure, audit logging, service accounts, and unusual API activity.'
-    };
-  }
-
-  return {
-    relevance: 'Strategic cyber monitoring',
-    note: 'This pulse should be treated as a monitoring signal rather than a standalone conclusion. Review whether the indicators, tactics, or affected technologies overlap with your environment or critical suppliers.',
-    action: 'Compare the pulse against known assets, key vendors, exposed systems, security logs, and current incident priorities.'
-  };
-}
-
-
-function buildSectorRelevance(pulse) {
-  const text = `${pulse.name || ''} ${pulse.description || ''}`.toLowerCase();
-
-  const sectors = new Set();
-
-  if (text.includes('bank') || text.includes('finance') || text.includes('payment') || text.includes('invoice') || text.includes('fraud')) {
-    sectors.add('Financial Services');
-  }
-
-  if (text.includes('health') || text.includes('hospital') || text.includes('patient') || text.includes('medical')) {
-    sectors.add('Healthcare');
-  }
-
-  if (text.includes('government') || text.includes('public sector') || text.includes('municipal') || text.includes('state')) {
-    sectors.add('Government');
-  }
-
-  if (text.includes('energy') || text.includes('utility') || text.includes('industrial') || text.includes('ot ') || text.includes('ics') || text.includes('scada')) {
-    sectors.add('Energy & Utilities');
-  }
-
-  if (text.includes('ransom') || text.includes('phish') || text.includes('credential') || text.includes('malware') || text.includes('cve') || text.includes('exploit')) {
-    sectors.add('SME / Mid-market');
-  }
-
-  if (text.includes('cloud') || text.includes('supply') || text.includes('vendor') || text.includes('third-party')) {
-    sectors.add('Technology / Service Providers');
-  }
-
-  const list = Array.from(sectors);
-
-  return list.length > 0 ? list.slice(0, 4) : ['Cross-sector monitoring'];
-}
-
-function getSectorIcon(sector) {
-  if (sector.includes('Financial')) return <Building2 size={14} />;
-  if (sector.includes('Healthcare')) return <HeartPulse size={14} />;
-  if (sector.includes('Government')) return <Landmark size={14} />;
-  if (sector.includes('Energy')) return <Factory size={14} />;
-  if (sector.includes('SME')) return <Store size={14} />;
-  return <Globe2 size={14} />;
-}
-
-function OtxLivePanel() {
-  const [status, setStatus] = useState('loading');
-  const [message, setMessage] = useState('Checking secure OTX preview route...');
-  const [pulses, setPulses] = useState([]);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadPulses() {
-      try {
-        const response = await fetch('/api/otx-pulses');
-        const data = await response.json();
-
-        if (ignore) return;
-
-        if (!response.ok || !data.ok) {
-          setStatus('fallback');
-          setMessage(data.message || 'OTX preview is not available in this environment yet.');
-          setPulses([]);
-          return;
-        }
-
-        setStatus('live');
-        setMessage(data.message || 'OTX preview data loaded through the secure serverless route.');
-        setPulses(data.pulses || []);
-      } catch (error) {
-        if (ignore) return;
-        setStatus('fallback');
-        setMessage('OTX preview is unavailable. Static tracker content remains active.');
-        setPulses([]);
-      }
-    }
-
-    loadPulses();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  return (
-    <section id="otx-live" className="content-section otx-section">
-      <div className="section-heading">
-        <div>
-          <div className="section-kicker"><DatabaseZap size={16} /> Live OTX Feed</div>
-          <h2>Live cyber source feed</h2>
-          <p>
-            A curated live/open-source preview using a secure Vercel serverless route. Each item includes a Cygnus Analyst Note, sector relevance tags, and a link to the full OTX pulse in a new browser tab.
-          </p>
-        </div>
-        <div className={`otx-status ${status}`}>{status === 'live' ? 'Live route active' : status === 'loading' ? 'Checking route' : 'Fallback mode'}</div>
-      </div>
-
-      <div className="otx-panel">
-        <div className="otx-summary-card">
-          <div className="status-row"><span className="pulse-dot" /> {message}</div>
-          <h3>OTX API Foundation</h3>
-          <p>
-            The frontend requests <strong>/api/otx-pulses</strong>. The serverless function keeps the private OTX API key on the server side and returns simplified pulse summaries plus source links. The analyst note layer then translates those signals into business-risk language.
-          </p>
-        </div>
-
-        <div className="otx-pulse-list">
-          {status === 'live' && pulses.length > 0 ? (
-            pulses.map((pulse) => (
-              <article className="otx-pulse-card" key={pulse.id || pulse.name}>
-                <div>
-                  <strong>{pulse.name}</strong>
-                  <span>{pulse.description || 'No description provided in the preview payload.'}</span>
-                </div>
-                <div className="otx-meta">
-                  <em>{pulse.indicatorCount} indicators</em>
-                  <em>{pulse.modified || 'Modified date unavailable'}</em>
-                </div>
-
-                {(() => {
-                  const analystNote = buildAnalystNote(pulse);
-                  return (
-                    <div className="analyst-note-card">
-                      <div className="analyst-note-heading">
-                        <NotebookPen size={16} />
-                        <strong>Cygnus Analyst Note</strong>
-                        <em>{analystNote.relevance}</em>
-                      </div>
-                      <p>{analystNote.note}</p>
-                      <div className="analyst-action">
-                        <BriefcaseBusiness size={15} />
-                        <span><strong>Recommended monitoring action:</strong> {analystNote.action}</span>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                <div className="sector-relevance-block">
-                  <strong>Sector relevance</strong>
-                  <div className="sector-tag-row">
-                    {buildSectorRelevance(pulse).map((sector) => (
-                      <span key={sector}>{getSectorIcon(sector)} {sector}</span>
-                    ))}
-                  </div>
-                </div>
-
-                {pulse.url ? (
-                  <a
-                    className="otx-source-link"
-                    href={pulse.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`Open full OTX pulse for ${pulse.name}`}
-                  >
-                    View full OTX pulse <ExternalLink size={14} />
-                  </a>
-                ) : (
-                  <span className="otx-source-link disabled">Source link unavailable</span>
-                )}
-              </article>
-            ))
-          ) : (
-            <article className="otx-pulse-card static-fallback">
-              <strong>Static fallback active</strong>
-              <span>
-                The tracker remains fully usable while the live OTX route is unavailable locally or while Vercel is waiting
-                for a redeploy with the OTX_API_KEY environment variable.
-              </span>
-              <div className="otx-meta"><em>No API key exposed</em><em>Safe fallback</em></div>
-            </article>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Dashboard() {
-  const [selected, setSelected] = useState('All');
-  const filteredThreats = useMemo(() => {
-    if (selected === 'All') return threatItems;
-    return threatItems.filter((item) => item.severity === selected);
-  }, [selected]);
-
-  return (
-    <main>
-      <section className="overview-band">
-        <div className="overview-card">
-          <Activity size={24} />
-          <div><strong>Threat tempo</strong><span>High-volume credential abuse and extortion activity</span></div>
-        </div>
-        <div className="overview-card">
-          <Target size={24} />
-          <div><strong>Primary exposure</strong><span>Identity, third-party services, cloud, and remote access</span></div>
-        </div>
-        <div className="overview-card">
-          <Brain size={24} />
-          <div><strong>Strategic lens</strong><span>Business continuity, governance, resilience, and executive awareness</span></div>
-        </div>
-      </section>
-
-      <ExecutiveBriefing />
-
-      <CyberRiskMapSection />
-
-      <NcscLivePanel />
-
-      <NcscGuidanceSection />
-
-      <CyberInsuranceSection />
-
-      <OtxLivePanel />
-
-      <section id="sector-relevance-overview" className="content-section sector-relevance-overview">
-        <div className="section-heading">
-          <div>
-            <div className="section-kicker"><Layers3 size={16} /> Sector Relevance Layer</div>
-            <h2>Cyber signals mapped to business exposure</h2>
-            <p>
-              v0.9 adds a lightweight sector relevance layer to help users understand whether a cyber signal may be
-              more relevant to financial services, healthcare, government, energy, SMEs, technology providers, or cross-sector monitoring.
-            </p>
-          </div>
-        </div>
-        <div className="sector-explain-grid">
-          <article>
-            <Building2 size={22} />
-            <strong>Financial Services</strong>
-            <span>Fraud, credential theft, payment redirection, and third-party exposure.</span>
-          </article>
-          <article>
-            <HeartPulse size={22} />
-            <strong>Healthcare</strong>
-            <span>Ransomware disruption, sensitive data exposure, and operational dependency.</span>
-          </article>
-          <article>
-            <Landmark size={22} />
-            <strong>Government</strong>
-            <span>Public service disruption, espionage, identity exposure, and citizen trust impact.</span>
-          </article>
-          <article>
-            <Factory size={22} />
-            <strong>Energy & Utilities</strong>
-            <span>Operational technology, critical infrastructure, and geopolitical targeting.</span>
-          </article>
-        </div>
-      </section>
-
-
-      <section id="ai-patching" className="content-section ai-patching-section">
-        <div className="section-heading">
-          <div>
-            <div className="section-kicker"><Bot size={16} /> AI Systems Risk & Patching</div>
-            <h2>AI patching for emerging cyber and governance exposure</h2>
-            <p>
-              Tracks practical actions for reducing risk in AI-enabled systems, including prompt hardening, data-access
-              reviews, guardrail updates, output validation, logging improvements, and human-in-the-loop controls.
-            </p>
-          </div>
-        </div>
-
-        <div className="ai-patching-layout">
-          <div className="ai-card-grid">
-            {aiPatchingItems.map((item) => (
-              <article className="ai-patch-card" key={item.title}>
-                <div className="card-topline">
-                  <div className="icon-bubble">{item.icon}</div>
-                  <span className={`risk-pill ${getSeverityClass(item.severity)}`}>{item.severity}</span>
-                </div>
-                <h3>{item.title}</h3>
-                <p>{item.summary}</p>
-                <div className="patch-type">Patch type: <strong>{item.patchType}</strong></div>
-                <div className="signal-list">
-                  {item.actions.map((action) => <span key={action}>{action}</span>)}
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <aside className="ai-cycle-card">
-            <div className="section-kicker"><ShieldCheck size={16} /> AI Patch Cycle</div>
-            <h3>Practical remediation loop</h3>
-            <div className="ai-cycle-list">
-              {aiPatchCycle.map((item) => (
-                <div className="ai-cycle-row" key={item.step}>
-                  <strong>{item.step}</strong>
-                  <span>{item.detail}</span>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </div>
-      </section>
-
-
-      <section id="watchlist" className="content-section">
-        <div className="section-heading">
-          <div>
-            <div className="section-kicker"><Flame size={16} /> Strategic Watchlist</div>
-            <h2>Priority cyber risk focus areas</h2>
-            <p>Designed as a simple executive scanning layer before live cyber intelligence feeds are added.</p>
-          </div>
-        </div>
-        <div className="watchlist-grid">
-          {watchlist.map((item) => (
-            <article className="watch-card" key={item.title}>
-              <div className="watch-topline">
-                <span>{item.priority}</span>
-                <ClipboardCheck size={20} />
-              </div>
-              <h3>{item.title}</h3>
-              <p>{item.detail}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="cygnus-branding" className="content-section">
-        <div className="section-heading">
-          <div>
-            <div className="section-kicker"><Globe2 size={16} /> Cygnus Branding</div>
-            <h2>Built as a separate Cygnus cyber tracker</h2>
-            <p>This baseline gives the cyber tracker its own identity while staying aligned with the wider Cygnus risk intelligence design language.</p>
-          </div>
-        </div>
-        <div className="principles-grid">
-          {brandingPrinciples.map((item) => (
-            <article className="principle-card" key={item.title}>
-              <div className="principle-icon">{item.icon}</div>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="threat-landscape" className="content-section">
-        <div className="section-heading">
-          <div>
-            <div className="section-kicker"><Siren size={16} /> Threat Landscape</div>
-            <h2>Cyber risk themes</h2>
-            <p>Static intelligence cards designed for executive scanning. Live feeds are intentionally reserved for a later phase.</p>
-          </div>
-          <div className="filter-tabs" aria-label="Filter threat cards">
-            {['All', 'High', 'Elevated', 'Moderate'].map((filter) => (
-              <button
-                key={filter}
-                className={selected === filter ? 'active' : ''}
-                onClick={() => setSelected(filter)}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="threat-grid">
-          {filteredThreats.map((item) => <ThreatCard key={item.id} item={item} />)}
-        </div>
-      </section>
-
-      <section id="readiness" className="split-section">
-        <div className="panel-card">
-          <div className="section-kicker"><Layers3 size={16} /> Sector Exposure</div>
-          <h2>Sector risk view</h2>
-          <div className="sector-list">
-            {sectorRisk.map((item) => (
-              <div className="sector-row" key={item.sector}>
-                <div>
-                  <strong>{item.sector}</strong>
-                  <span>{item.driver}</span>
-                </div>
-                <span className={`risk-pill ${getSeverityClass(item.level)}`}>{item.level}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="panel-card readiness-panel">
-          <div className="section-kicker"><ClipboardCheck size={16} /> Readiness Snapshot</div>
-          <h2>Executive resilience checks</h2>
-          <div className="readiness-list">
-            {readinessItems.map((item) => (
-              <div className="readiness-row" key={item.label}>
-                <div>
-                  <strong>{item.label}</strong>
-                  <span>{item.description}</span>
-                </div>
-                <em>{item.status}</em>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="split-section">
-        <div className="panel-card dark-panel">
-          <div className="section-kicker"><DatabaseZap size={16} /> Source Architecture</div>
-          <h2>Data integration roadmap</h2>
-          <p>
-            This build remains a static public preview. Live API integration should be phased in carefully to preserve
-            readability and avoid turning the tracker into a cluttered feed wall.
-          </p>
-          <div className="source-stack">
-            {intelligenceSources.map((source) => (
-              <div className="source-item" key={source.name}>
-                <div><strong>{source.name}</strong><span>{source.note}</span></div>
-                <em>{source.status}</em>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div id="help" className="panel-card help-panel">
-          <div className="section-kicker"><CircleHelp size={16} /> Terminology Help</div>
-          <h2>Cyber intelligence terms</h2>
-          <div className="term-list">
-            {terminology.map((item) => (
-              <div className="term-row" key={item.term}>
-                <strong>{item.term}</strong>
-                <span>{item.meaning}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="methodology" className="content-section methodology-section">
-        <div className="section-heading compact">
-          <div>
-            <div className="section-kicker"><Info size={16} /> Methodology</div>
-            <h2>How to interpret the tracker</h2>
-          </div>
-        </div>
-        <div className="method-grid">
-          {methodology.map((item) => (
-            <article className="method-card" key={item.title}>
-              <CheckCircle2 size={20} />
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="future-section">
-        <div>
-          <div className="section-kicker"><Zap size={16} /> Future Phase</div>
-          <h2>OTX API integration reserved for a later phase</h2>
-          <p>
-            A later phase can add AlienVault OTX pulses, indicators, malware families, adversary tags, and cyber
-            intelligence summaries. For now, this build improves structure, readability, and cyber-specific decision support.
-          </p>
-        </div>
-        <div className="future-icons">
-          <LockKeyhole />
-          <Network />
-          <Bug />
-          <FileWarning />
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function Footer() {
-  return (
-    <footer>
-      <div>
-        <strong>Cygnus Development</strong>
-        <span>Risk Intelligence Technology</span>
-      </div>
-      <p>Cygnus Cyber Risk Intelligence Tracker v1.4.6.1 · Static cyber intelligence preview · No live API data in this build</p>
-    </footer>
-  );
-}
-
-export default function App() {
-  return (
-    <div className="app-shell">
-      <Header />
-      <Dashboard />
-      <Footer />
+function Sidebar(){
+  return <aside className="sidebar">
+    <div className="brand">
+      <div className="brand-mark">C</div>
+      <div><strong>CYGNUS DEVELOPMENT</strong><span>RISK INTELLIGENCE TECHNOLOGY</span></div>
     </div>
-  );
+    <nav>
+      {navItems.map(([id,label,Icon]) => <a href={`#${id}`} key={id}><Icon size={17}/><span>{label}</span></a>)}
+    </nav>
+    <div className="side-status"><span className="live-dot"/><div><strong>v1.5 Prototype</strong><span>Continuous upgrades planned</span></div></div>
+  </aside>
+}
+
+function DashboardHeader(){
+  return <header id="overview" className="hero">
+    <div>
+      <div className="kicker"><Radar size={16}/> Now Live · Prototype Preview</div>
+      <h1>Cygnus Cyber Risk Intelligence Tracker</h1>
+      <p>A dashboard-style cyber risk intelligence prototype combining live feeds, curated regional risk mapping, analyst notes, sector relevance, AI patching, cyber insurance guidance, and executive decision support.</p>
+    </div>
+    <div className="posture-card"><span>Current posture</span><strong>Elevated</strong><em>Best viewed on PC or laptop. Mobile users should view in landscape mode.</em></div>
+  </header>
+}
+
+function OverviewCards({otxCount,ncscCount}){
+  const cards = [
+    ['Overall Risk Posture','Elevated','Curated strategic view', ShieldAlert],
+    ['OTX Signals', otxCount || 'Live','Secure route active where configured', Radar],
+    ['NCSC Items', ncscCount || 'Live','RSS advisory route', Rss],
+    ['Regions Monitored', markers.length,'Curated map indicators', MapPinned]
+  ];
+  return <section className="stat-grid">{cards.map(([l,v,n,Icon]) => <article className="stat" key={l}><div><Icon size={22}/></div><span>{l}</span><strong>{v}</strong><em>{n}</em></article>)}</section>
+}
+
+function CyberRiskMap(){
+  return <section id="cyber-risk-map" className="map-section">
+    <div className="note"><MapPinned size={20}/><div><strong>Map purpose</strong><span>The map highlights curated regional cyber risk indicators and explains why they matter for resilience, insurance readiness, sector exposure, and executive monitoring. It is not a simulated attack map.</span></div></div>
+    <div className="map-layout">
+      <div className="map-card">
+        <MapContainer center={[20,10]} zoom={2} minZoom={2} maxZoom={5} scrollWheelZoom={false} worldCopyJump className="cyber-map">
+          <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {markers.map(m => <CircleMarker key={m.region} center={m.coords} radius={riskRadius(m.risk)} pathOptions={{ color:'#fff', weight:2, fillColor:riskColor(m.risk), fillOpacity:0.86 }}>
+            <Popup><div className="map-popup"><strong>{m.region}</strong><span className={`risk-pill ${riskClass(m.risk)}`}>{m.risk}</span><p><b>Theme:</b> {m.theme}</p><p><b>Source basis:</b> {m.source}</p><p><b>Cygnus note:</b> {m.note}</p><p><b>Recommended action:</b> {m.action}</p></div></Popup>
+          </CircleMarker>)}
+        </MapContainer>
+        <div className="map-caption"><MousePointerClick size={16}/><span>Click a marker to review the curated regional intelligence note.</span></div>
+      </div>
+      <aside className="hotspots">
+        <div className="kicker white"><LocateFixed size={16}/> Hot Spots</div>
+        <h2>Highest regional signals</h2>
+        <div className="hotspot-list">{markers.filter(m=>m.risk!=='Moderate').slice(0,5).map(m => <div className="hotspot" key={m.region}><i style={{background:riskColor(m.risk)}}/><div><strong>{m.region}</strong><span>{m.theme}</span></div></div>)}</div>
+        <div className="method"><strong>Map method</strong><p>Curated regional indicators. Not an exhaustive attack map.</p></div>
+      </aside>
+    </div>
+  </section>
+}
+
+function ThreatSummary(){
+  return <section className="split">
+    <article className="panel">
+      <div className="kicker"><Flame size={16}/> Highest Threat Themes</div>
+      <h2>Priority cyber themes</h2>
+      <div className="rows">{threats.map(([t,r,tr,n]) => <div className="row" key={t}><div><strong>{t}</strong><span>{tr} · {n}</span></div><span className={`risk-pill ${riskClass(r)}`}>{r}</span></div>)}</div>
+    </article>
+    <article className="panel">
+      <div className="kicker"><DatabaseZap size={16}/> Intelligence Status</div>
+      <h2>Source status</h2>
+      <div className="status-grid">{[['OTX','Live route',CheckCircle2],['NCSC','RSS route',CheckCircle2],['Analyst Notes','Enabled',NotebookPen],['Map','Curated',Globe2]].map(([a,b,Icon])=><div key={a}><Icon size={20}/><strong>{a}</strong><span>{b}</span></div>)}</div>
+    </article>
+  </section>
+}
+
+function OtxLivePanel({onCount}){
+  const [status,setStatus]=useState('loading'), [message,setMessage]=useState('Checking secure OTX route...'), [pulses,setPulses]=useState([]);
+  useEffect(()=>{let off=false; (async()=>{try{const r=await fetch('/api/otx-pulses'); const d=await r.json(); if(off)return; if(!r.ok||!d.ok){setStatus('fallback');setMessage(d.message||'OTX route unavailable.');setPulses([]);onCount?.(0);return} setStatus('live');setMessage(d.message||'Live OTX preview loaded.');setPulses(d.pulses||[]);onCount?.((d.pulses||[]).length)}catch(e){if(!off){setStatus('fallback');setMessage('OTX preview unavailable. Static guidance remains active.');setPulses([]);onCount?.(0)}}})(); return()=>{off=true}},[onCount]);
+  return <section id="otx-live" className="section"><SectionHead icon={<Radar/>} title="Live OTX Feed" eyebrow="Open-source cyber threat pulses" text="A secure serverless route loads OTX pulse summaries. Each item includes a Cygnus Analyst Note, sector relevance, and a full-source link." status={status} statusText={status==='live'?'Live OTX route active':status==='loading'?'Checking route':'Fallback mode'}/>
+    <div className="feed-layout"><FeedSummary color="gold" title="OTX intelligence route" message={message} text="The frontend requests /api/otx-pulses. The serverless function keeps the private OTX API key on the server side."/>
+      <div className="feed-list">{status==='live'&&pulses.length>0?pulses.map(p=><OtxCard key={p.id||p.name} p={p}/>):<Fallback title="Static cyber intelligence active" text="The tracker remains usable while the OTX route is unavailable."/>}</div>
+    </div>
+  </section>
+}
+function OtxCard({p}){ const [rel,act]=buildAnalystNote(p); return <article className="feed-card"><div><strong>{p.name}</strong><span>{p.description||'No description provided.'}</span></div><div className="meta"><em>{p.indicatorCount} indicators</em><em>{p.modified||'Modified date unavailable'}</em></div><AnalystNote rel={rel} text={act}/><div className="sector-block"><strong>Sector relevance</strong><div className="tags">{['Financial Services','Government','SME / Mid-market'].map(s=><span key={s}>{s}</span>)}</div></div>{p.url&&<a className="source-link" href={p.url} target="_blank" rel="noreferrer">View full OTX pulse <ExternalLink size={14}/></a>}</article> }
+
+function NcscLivePanel({onCount}){
+  const [status,setStatus]=useState('loading'), [message,setMessage]=useState('Checking live NCSC RSS route...'), [items,setItems]=useState([]);
+  useEffect(()=>{let off=false; (async()=>{try{const r=await fetch('/api/ncsc-feed'); const d=await r.json(); if(off)return; if(!r.ok||!d.ok){setStatus('fallback');setMessage(d.message||'NCSC RSS unavailable.');setItems([]);onCount?.(0);return} setStatus('live');setMessage(d.message||'NCSC RSS feed loaded.');setItems(d.items||[]);onCount?.((d.items||[]).length)}catch(e){if(!off){setStatus('fallback');setMessage('NCSC RSS preview unavailable. Static guidance remains active.');setItems([]);onCount?.(0)}}})(); return()=>{off=true}},[onCount]);
+  return <section id="ncsc-live" className="section"><SectionHead icon={<Rss/>} title="Live NCSC RSS Feed" eyebrow="Official reports and advisory updates" text="A lightweight serverless route loads NCSC reports and advisory updates. No API key is required." status={status} statusText={status==='live'?'Live NCSC route active':status==='loading'?'Checking route':'Fallback mode'}/>
+    <div className="feed-layout"><FeedSummary color="blue" title="NCSC RSS route" message={message} text="The frontend requests /api/ncsc-feed and returns simplified advisory items for the tracker."/>
+      <div className="feed-list">{status==='live'&&items.length>0?items.map(i=><NcscCard key={i.link||i.title} i={i}/>):<Fallback title="Static NCSC guidance active" text="The tracker remains usable while the live NCSC route is unavailable."/>}</div>
+    </div>
+  </section>
+}
+function NcscCard({i}){ const [rel,act]=buildAnalystNote(i); return <article className="feed-card"><div><strong>{i.title}</strong><span>{i.summary||'No summary provided.'}</span></div><div className="meta"><em>{i.pubDate||'Publish date unavailable'}</em><em>{i.source||'NCSC'}</em></div><AnalystNote rel={rel} text={act}/>{i.link&&<a className="source-link" href={i.link} target="_blank" rel="noreferrer">View full NCSC item <ExternalLink size={14}/></a>}</article> }
+
+function ExecutiveBriefing(){
+  return <section id="executive-briefing" className="section"><SectionHead icon={<BookOpenCheck/>} title="Executive Cyber Briefing" eyebrow="Decision-focused summary" text="A concise executive layer that brings together the map, live feeds, analyst notes, sector relevance, AI risk, insurance guidance, and readiness."/>
+    <div className="brief-grid"><article className="brief-hero"><span>Current posture</span><strong>Elevated</strong><p>The cyber risk posture remains elevated due to ransomware, credential compromise, exposed systems, third-party dependency, and AI-enabled system governance challenges.</p><div className="brief-tags"><em>Map active</em><em>Live feeds active where configured</em><em>Analyst notes enabled</em></div></article>
+    <div className="brief-stack">{[['Identity and access control','Prioritise MFA, privileged account controls, sign-in monitoring, and BEC prevention.'],['Resilience against disruption','Validate backups, escalation roles, restore procedures, endpoint visibility, and communications.'],['AI-enabled system governance','Review AI access to sensitive data, guardrails, and human review for high-impact outputs.']].map(([a,b])=><article className="brief-card" key={a}><ShieldQuestion size={20}/><div><strong>{a}</strong><span>{b}</span></div></article>)}</div></div>
+    <article className="dark-panel"><div className="kicker white"><Megaphone size={16}/> Recommended Executive Actions</div><h2>Priority actions for the next review cycle</h2><div className="dark-list">{['Review live OTX and NCSC items for overlap with assets, vendors, cloud services, and exposed systems.','Use the Cyber Risk Intelligence Map to understand regional themes and source-backed priorities.','Treat AI patching and cyber insurance readiness as part of the same resilience cycle.'].map(x=><div key={x}><Megaphone size={16}/><span>{x}</span></div>)}</div></article>
+  </section>
+}
+
+function GuidanceInsuranceAi(){
+  return <>
+    <section id="ncsc-guidance" className="section"><SectionHead icon={<BookMarked/>} title="NCSC Advisory & Guidance Layer" eyebrow="Official guidance layer" text="Official guidance supports cyber risk validation, mitigation, readiness, insurance evidence, and executive reporting."/><CardGrid items={ncscGuidance}/></section>
+    <section id="cyber-insurance" className="section"><SectionHead icon={<ShieldPlus/>} title="Cyber Insurance & Risk Transfer" eyebrow="Financial resilience" text="Cyber insurance does not replace controls, but it can help organisations manage the financial impact of cyber incidents."/><CardGrid items={insurance}/><article className="dark-panel"><div className="kicker white"><Handshake size={16}/> Broker / Insurer Questions</div><h2>Questions before relying on the policy</h2><div className="dark-list">{['Does the policy cover ransomware, extortion support, restoration costs, and business interruption?','Does wording cover cloud outages, MSP incidents, or software supply-chain disruption?','Are AI-related cyber incidents excluded, sublimited, or subject to additional requirements?','Which incident response vendors and notification timelines apply?'].map(q=><div key={q}><Scale size={16}/><span>{q}</span></div>)}</div></article></section>
+    <section id="ai-patching" className="section"><SectionHead icon={<Bot/>} title="AI Systems Risk & Patching" eyebrow="AI cyber governance" text="Tracks prompt hardening, data-access reviews, guardrail updates, output validation, logging improvements, and human-in-the-loop controls."/><div className="ai-grid">{aiItems.map(([t,r,type,s,Icon])=><article className="card" key={t}><div className="topline"><div className="icon"><Icon size={20}/></div><span className={`risk-pill ${riskClass(r)}`}>{r}</span></div><h3>{t}</h3><p>{s}</p><div className="patch">Patch type: <strong>{type}</strong></div></article>)}</div></section>
+  </>
+}
+
+function WatchSectorThreats(){
+  const [selected,setSelected]=useState('All');
+  const filtered = useMemo(()=> selected==='All'?threats:threats.filter(t=>t[1]===selected),[selected]);
+  return <>
+    <section id="watchlist" className="section"><SectionHead icon={<Flame/>} title="Strategic Watchlist" eyebrow="Priority focus areas" text="Executive scanning layer for priority cyber risk areas."/><div className="grid4">{watchlist.map(([a,b,c])=><article className="card" key={a}><div className="watch"><span>{b}</span><ClipboardCheck size={20}/></div><h3>{a}</h3><p>{c}</p></article>)}</div></section>
+    <section id="sector-relevance" className="section"><SectionHead icon={<Layers3/>} title="Sector Relevance Layer" eyebrow="Business exposure" text="Cyber signals mapped to sector exposure and operating context."/><div className="rows panel-pad">{sectorRisk.map(([a,b,c])=><div className="row" key={a}><div><strong>{a}</strong><span>{c}</span></div><span className={`risk-pill ${riskClass(b)}`}>{b}</span></div>)}</div></section>
+    <section id="threat-landscape" className="section"><SectionHead icon={<Siren/>} title="Cyber Risk Themes" eyebrow="Threat landscape" text="Static intelligence cards for executive scanning."/><div className="filters">{['All','High','Elevated','Moderate'].map(f=><button key={f} className={selected===f?'active':''} onClick={()=>setSelected(f)}>{f}</button>)}</div><div className="grid2">{filtered.map(([a,b,c,d])=><article className="card" key={a}><div className="topline"><div className="icon"><ShieldAlert size={20}/></div><span className={`risk-pill ${riskClass(b)}`}>{b}</span></div><h3>{a}</h3><p>{d}</p><div className="meta"><em>Trend: {c}</em></div></article>)}</div></section>
+  </>
+}
+
+function ReadinessHelp(){
+  return <section id="readiness-help" className="section"><div className="grid2"><article className="panel"><div className="kicker"><ShieldCheck size={16}/> Readiness Snapshot</div><h2>Executive resilience checks</h2><div className="rows">{readiness.map(([a,b,c])=><div className="row" key={a}><div><strong>{a}</strong><span>{c}</span></div><em>{b}</em></div>)}</div></article><article className="panel"><div className="kicker"><CircleHelp size={16}/> Help & Methodology</div><h2>How to interpret the tracker</h2><div className="rows">{[['Severity','Likely operational, financial, reputational, and regulatory impact.'],['Trend Direction','Whether observable threat activity appears to be increasing, stable, or decreasing.'],['Assessment Confidence','Quality, consistency, and timeliness of available source information.'],['Strategic Relevance','Connection between technical signals and business risk decisions.']].map(([a,b])=><div className="row column" key={a}><strong>{a}</strong><span>{b}</span></div>)}</div></article></div></section>
+}
+
+function SectionHead({icon,title,eyebrow,text,status,statusText}){
+  return <div className="section-head"><div><div className="kicker">{React.cloneElement(icon,{size:16})} {eyebrow}</div><h2>{title}</h2><p>{text}</p></div>{status&&<div className={`status ${status}`}>{statusText}</div>}</div>
+}
+function FeedSummary({color,title,message,text}){return <article className={`feed-summary ${color}`}><div className="feed-status"><span className="pulse-dot"/> {message}</div><h3>{title}</h3><p>{text}</p></article>}
+function Fallback({title,text}){return <article className="feed-card"><strong>{title}</strong><span>{text}</span><div className="meta"><em>Safe fallback</em><em>Static guidance active</em></div></article>}
+function AnalystNote({rel,text}){return <div className="analyst"><div><NotebookPen size={16}/><strong>Cygnus Analyst Note</strong><em>{rel}</em></div><p>{text}</p></div>}
+function CardGrid({items}){return <div className="grid4">{items.map(([t,s,Icon])=><article className="card" key={t}><div className="icon"><Icon size={22}/></div><h3>{t}</h3><p>{s}</p></article>)}</div>}
+
+function Footer(){return <footer><div><strong>Cygnus Development</strong><span>Risk Intelligence Technology</span></div><p>Cygnus Cyber Risk Intelligence Tracker v1.5 · Dashboard layout prototype · Continuous upgrades planned</p></footer>}
+
+export default function App(){
+  const [otxCount,setOtxCount]=useState(0), [ncscCount,setNcscCount]=useState(0);
+  return <div className="app"><Sidebar/><main className="main"><DashboardHeader/><OverviewCards otxCount={otxCount} ncscCount={ncscCount}/><CyberRiskMap/><ThreatSummary/><OtxLivePanel onCount={setOtxCount}/><NcscLivePanel onCount={setNcscCount}/><ExecutiveBriefing/><GuidanceInsuranceAi/><WatchSectorThreats/><ReadinessHelp/><Footer/></main></div>
 }
