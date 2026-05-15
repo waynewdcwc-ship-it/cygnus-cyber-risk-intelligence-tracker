@@ -1,8 +1,8 @@
-# Cygnus Cyber Risk Intelligence Tracker v1.5
+# Cygnus Cyber Risk Intelligence Tracker v1.5.1
 
 Dashboard layout redesign for the Cygnus Cyber Risk Intelligence Tracker.
 
-## v1.5 updates
+## v1.5.1 updates
 
 - Converted the tracker from a long landing-page layout into a dashboard-style intelligence interface
 - Added a left-side navigation menu on desktop
@@ -29,3 +29,6 @@ npm run dev
 ## Important dependency note
 
 If Vercel shows a registry/package-lock error, delete `package-lock.json`, run `npm install --registry=https://registry.npmjs.org/` locally, then commit the regenerated lockfile.
+
+
+- Replaced the previous text-only sidebar brand block with the Cygnus corporate banner.

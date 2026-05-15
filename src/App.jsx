@@ -1,6 +1,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import sidebarBrandBanner from './assets/cygnus-sidebar-banner.png';
 import {
   Activity, Banknote, BellRing, BookMarked, BookOpenCheck, Bot, BriefcaseBusiness,
   Building2, CheckCircle2, CircleDollarSign, CircleHelp, ClipboardCheck, CloudCog,
@@ -98,13 +99,12 @@ function buildAnalystNote(item) {
 function Sidebar(){
   return <aside className="sidebar">
     <div className="brand">
-      <div className="brand-mark">C</div>
-      <div><strong>CYGNUS DEVELOPMENT</strong><span>RISK INTELLIGENCE TECHNOLOGY</span></div>
+      <img src={sidebarBrandBanner} alt="Cygnus Development Risk Intelligence Technology" className="brand-banner" />
     </div>
     <nav>
       {navItems.map(([id,label,Icon]) => <a href={`#${id}`} key={id}><Icon size={17}/><span>{label}</span></a>)}
     </nav>
-    <div className="side-status"><span className="live-dot"/><div><strong>v1.5 Prototype</strong><span>Continuous upgrades planned</span></div></div>
+    <div className="side-status"><span className="live-dot"/><div><strong>v1.5.1 Prototype</strong><span>Continuous upgrades planned</span></div></div>
   </aside>
 }
 
@@ -227,7 +227,7 @@ function Fallback({title,text}){return <article className="feed-card"><strong>{t
 function AnalystNote({rel,text}){return <div className="analyst"><div><NotebookPen size={16}/><strong>Cygnus Analyst Note</strong><em>{rel}</em></div><p>{text}</p></div>}
 function CardGrid({items}){return <div className="grid4">{items.map(([t,s,Icon])=><article className="card" key={t}><div className="icon"><Icon size={22}/></div><h3>{t}</h3><p>{s}</p></article>)}</div>}
 
-function Footer(){return <footer><div><strong>Cygnus Development</strong><span>Risk Intelligence Technology</span></div><p>Cygnus Cyber Risk Intelligence Tracker v1.5 · Dashboard layout prototype · Continuous upgrades planned</p></footer>}
+function Footer(){return <footer><div><strong>Cygnus Development</strong><span>Risk Intelligence Technology</span></div><p>Cygnus Cyber Risk Intelligence Tracker v1.5.1 · Branding banner update · Continuous upgrades planned</p></footer>}
 
 export default function App(){
   const [otxCount,setOtxCount]=useState(0), [ncscCount,setNcscCount]=useState(0);
